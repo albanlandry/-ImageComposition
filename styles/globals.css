@@ -15,6 +15,14 @@ a {
   box-sizing: border-box;
 }
 
+.btn-default {
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  padding: 8px;
+  color: #ffffff;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

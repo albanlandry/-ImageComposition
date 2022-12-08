@@ -1,6 +1,9 @@
 import React, {useRef} from 'react';
 import Template from '../src/Template';
 import Canvas, {testering} from '../src/drawing/Canvas';
+import { Rect, Image }from '../src/drawing/drawables/Shapes';
+import { shapes } from 'konva/lib/Shape';
+
 
 /**
  * 
@@ -64,16 +67,57 @@ const DefaultHomeArea = React.memo(() => {
     )
 });
 
+const image_url = "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4=";
+
+const generate_rects = (count) => {    
+    return Array(count).fill(0).map((_, i) => {
+        const x = Math.random() * 400;
+        const y = Math.random() * 600;
+        const hh = Math.random() * 400;
+        const ww = Math.random() * 600;
+        const h = Math.random() * 359;
+        const s = Math.random() * 100;
+        const l = Math.random() * 100;
+        const a = (Math.random() + 1) / 2;
+
+        return <Rect
+            key = {i}
+            x ={x} 
+            y = {y}
+            width = {ww}
+            height = {hh}
+            fillStyle = {`hsla(${h}, ${s}%, ${l}%, ${a})`}
+            />
+    });
+}
+
 /**
  * 
  * @param {*} props 
  * @returns 
  */
 const Viewport = (props) => {
+    const shapes = generate_rects(20);
 
     return(
         <div className="p-5 w-full flex justify-center items-center overflow-auto">
             <Canvas width={600} height={400}>
+                <Rect 
+                    x = {0}
+                    y = {0}
+                    width={600}
+                    height={400}               
+                />
+                <Image 
+                    x = {0}
+                    y = {0}
+                    source = {{uri: image_url}}
+                />
+                <Image 
+                    x = {50}
+                    y = {50}
+                    source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}
+                />
             </Canvas>
         </div>
     )

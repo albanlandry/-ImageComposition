@@ -138,6 +138,47 @@ const MainArea = function (props) {
     )
 };
 
+const SideMenu = (props) => {
+    const items = [
+        {label: "images 1", thumbnail: "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4="},
+        {label: "images 2", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}
+    ]
+
+    const children = items.map((item, index) => {
+        return <li key={index} className="p-1 box-border odd:border-b odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]">
+            <Thumbnail src={item.thumbnail} label={item.label} />
+        </li>
+    })
+
+    return (
+        <ul>
+            {children}
+        </ul>
+    )
+};
+
+
+/** THUMBNAIL COMPONENTS */
+const THUMB_IMAGE_DEFAULT_SIZE = 90;
+
+/**
+ * 
+ * @param {*} props 
+ */
+const Thumbnail = React.memo((props) => {
+    const width = props.width || THUMB_IMAGE_DEFAULT_SIZE;
+    const height = props.height || THUMB_IMAGE_DEFAULT_SIZE;
+
+    return (
+        <div className = "p-2 box-border align-middle pointer-events-none select-none">
+            <div className={`align-middle border-2 w-[${width}px] h-[${height}px]`}>
+                <img src = {props.src}/>
+            </div>
+            <span className="block px-2 text-sm">{props.label || ""}</span>
+        </div>
+    )
+});
+
 /**
  * 
  * @param {*} props 
@@ -145,6 +186,6 @@ const MainArea = function (props) {
  */
 export default function Editor (props) {
    return(
-    <Template mainArea={<MainArea />} />
+    <Template mainArea={<MainArea />} sideMenus={[<SideMenu />]} />
    )
 }

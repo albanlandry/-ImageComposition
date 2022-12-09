@@ -10,16 +10,10 @@ const Header = (props) => {
     )
 };
 
-const SideMenu = (props) => {
+const SideArea= (props) => {
     return (
         <div className="h-screen w-1/6 min-w-[180px]">
-            <ul className="w-full">
-                <li>1</li>
-                <li>2</li>
-                <li>3</li>
-                <li>4</li>
-                <li>5</li>
-            </ul>
+            { props.children }
         </div>
     )
 }
@@ -32,7 +26,9 @@ const Template = (props) => {
     return (<div className="w-full mx-auto">
         <Header />
         <div className="w-full bodyContainer flex">
-            <SideMenu />
+            <SideArea>
+                {props.sideMenus || null}
+            </SideArea>
             { props.mainArea ? props.mainArea: null }
         </div>
     </div>)

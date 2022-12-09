@@ -23,13 +23,14 @@ const Canvas = (props) => {
         // Add the context property to each child component.
         // Since the react components are sealed object, we cannot directly edit their properties.
         // Thus, we need to clone the object with the additional property
-        const res = Array(props.children).flat().map((child, id) =>  React.cloneElement(child, {context: cvs.getContext('2d'), key: id}) );
+        const res = Array(props.children).flat().map((child, id) => {
+            return React.cloneElement(child, {context: cvs.getContext('2d'), key: id});
+        });
 
         setComponents(res)
 
         const render = () => {
             
-
             animationId.current = window.requestAnimationFrame(render);
         };
 

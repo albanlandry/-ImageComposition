@@ -12,7 +12,7 @@ const Header = (props) => {
 
 const SideArea= (props) => {
     return (
-        <div className="h-screen w-1/6 min-w-[180px]">
+        <div className="h-full w-1/6 min-w-[180px]">
             { props.children }
         </div>
     )
@@ -23,9 +23,9 @@ const SideArea= (props) => {
  */
 const Template = (props) => {
 
-    return (<div className="w-full mx-auto">
+    return (<div className="absolute top-0 right-0 bottom-0 left-0 flex flex-col">
         <Header />
-        <div className="w-full bodyContainer flex">
+        <div className="w-full h-full bodyContainer flex">
             <SideArea>
                 {props.sideMenus || null}
             </SideArea>

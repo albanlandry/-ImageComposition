@@ -1,6 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import Victor from 'victor';
 import PropTypes from 'prop-types';
+// import { Stage, Layer, Star, Text } from 'react-konva';
+
 
 const CANVAS_DEFAULT_WIDTH = 300;
 const CANVAS_DEFAULT_HEIGHT = 150;
@@ -20,11 +22,13 @@ const Canvas = (props) => {
     useEffect(() => {
         const cvs = canvasRef.current;
 
+        console.log(props.children[0]);
+
         // Add the context property to each child component.
         // Since the react components are sealed object, we cannot directly edit their properties.
         // Thus, we need to clone the object with the additional property
         const res = Array(props.children).flat().map((child, id) => {
-            return React.cloneElement(child, {context: cvs.getContext('2d'), key: id});
+            return React.cloneElement(child, {canvas: cvs, context: cvs.getContext('2d'), key: id});
         });
 
         setComponents(res)

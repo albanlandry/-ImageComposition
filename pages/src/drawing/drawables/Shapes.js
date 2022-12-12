@@ -50,6 +50,8 @@ const Image = (props) => {
     const x = props.x || 0;
     const y = props.y || 0;
 
+    console.log(props.x, props.y);
+
     useEffect(() => {
         /**
          * 
@@ -73,9 +75,9 @@ const Image = (props) => {
             draw(ctx);
         };
 
-    }, [props.source])
+    }, [props.source, props.x, props.y])
 
-    return <></>
+    return null;
 };
 
 export { Rect, Image };

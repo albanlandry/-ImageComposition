@@ -1,8 +1,8 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import Template from '../src/Template';
 import Canvas, {testering} from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
-import { shapes } from 'konva/lib/Shape';
+import { Draggable } from '../src/drawing/drawables/Actions';
 
 
 /**
@@ -98,10 +98,16 @@ const generate_rects = (count) => {
  */
 const Viewport = (props) => {
     const shapes = generate_rects(20);
+    const [pos, setPos] = useState({x: 0, y: 0});
+
+    function onMouseMoveHandler(e) {
+        console.log('onMouseMoveHandler', e)
+    }
 
     return(
-        <div className="p-5 w-full flex justify-center items-center overflow-auto">
+        <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
             <Canvas width={600} height={400}>
+                <Draggable onMouseMoveHandler={onMouseMoveHandler} />
                 <Rect 
                     x = {0}
                     y = {0}
@@ -113,11 +119,15 @@ const Viewport = (props) => {
                     y = {0}
                     source = {{uri: image_url}}
                 />
-                <Image 
+                {
+                /*
+                    <Image 
                     x = {50}
                     y = {50}
                     source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}
                 />
+                */
+                }
             </Canvas>
         </div>
     )
@@ -131,7 +141,7 @@ const Viewport = (props) => {
 const MainArea = function (props) {
 
     return(
-        <div className="w-5/6 h-screen bg-[#dfe6e9]">
+        <div className="w-5/6 h-full bg-[#dfe6e9]">
             { /* <DefaultHomeArea /> */ }
             <Viewport />
         </div>
@@ -141,11 +151,12 @@ const MainArea = function (props) {
 const SideMenu = (props) => {
     const items = [
         {label: "images 1", thumbnail: "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4="},
-        {label: "images 2", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}
+        {label: "images 2", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"},
+        {label: "images 3", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.aZ3vzsdzZcLc0brFCniaRgHaE8%26pid%3DApi&f=1&ipt=522e4e4751f59c87589e6fdf991c3b52bb642da9a8dc1d89286e00c07078d054&ipo=images"},
     ]
 
     const children = items.map((item, index) => {
-        return <li key={index} className="p-1 box-border odd:border-b odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]">
+        return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]">
             <Thumbnail src={item.thumbnail} label={item.label} />
         </li>
     })
@@ -159,7 +170,7 @@ const SideMenu = (props) => {
 
 
 /** THUMBNAIL COMPONENTS */
-const THUMB_IMAGE_DEFAULT_SIZE = 90;
+const THUMB_IMAGE_DEFAULT_SIZE = 80;
 
 /**
  * 
@@ -170,11 +181,11 @@ const Thumbnail = React.memo((props) => {
     const height = props.height || THUMB_IMAGE_DEFAULT_SIZE;
 
     return (
-        <div className = "p-2 box-border align-middle pointer-events-none select-none">
-            <div className={`align-middle border-2 w-[${width}px] h-[${height}px]`}>
+        <div className = "p-2 box-border pointer-events-none select-none flex items-center">
+            <div className={`flex flex-1 items-center border w-[${width}px] h-[${height}px]`}>
                 <img src = {props.src}/>
             </div>
-            <span className="block px-2 text-sm">{props.label || ""}</span>
+            <span className="flex-2 px-2 text-sm">{props.label || ""}</span>
         </div>
     )
 });
@@ -186,6 +197,6 @@ const Thumbnail = React.memo((props) => {
  */
 export default function Editor (props) {
    return(
-    <Template mainArea={<MainArea />} sideMenus={[<SideMenu />]} />
+    <Template mainArea={<MainArea />} sideMenus={[<SideMenu key={0}/>]} />
    )
 }

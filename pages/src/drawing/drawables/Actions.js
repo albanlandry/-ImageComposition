@@ -95,10 +95,7 @@ const Draggable = (props) => {
         const onMouseDownHandler = (e) => {
             e.preventDefault();
 
-            // console.log('onMouseDownHandler', windowToCanvas(cvs, e.clientX, e.clientY));
             if(props.onMouseDown) props.onMouseDown(windowToCanvas(cvs, e.clientX, e.clientY));
-
-            console.log('onMouseDownHandler', windowToCanvas(cvs, e.clientX, e.clientY));
 
             isDragging.current = true;
         }
@@ -112,8 +109,6 @@ const Draggable = (props) => {
 
             if(props.onMouseUp) props.onMouseUp(windowToCanvas(cvs, e.clientX, e.clientY));
 
-            console.log('onMouseUpHandler', windowToCanvas(cvs, e.clientX, e.clientY));
-
             isDragging.current = false;
         }
 
@@ -124,7 +119,6 @@ const Draggable = (props) => {
         const onMouseMoveHandler = (e) => {
             e.preventDefault();
 
-            //  console.log('onMouseMoveHandler', windowToCanvas(cvs, e.clientX, e.clientY));
             if(isDragging.current && props.onMouseMoveHandler) {
                 props.onMouseMoveHandler(windowToCanvas(cvs, e.clientX, e.clientY));
                 // console.log('onMouseMoveHandler', windowToCanvas(cvs, e.clientX, e.clientY));

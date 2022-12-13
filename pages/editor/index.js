@@ -100,23 +100,26 @@ const Viewport = (props) => {
     const shapes = generate_rects(20);
     const [pos, setPos] = useState({x: 0, y: 0});
 
+    // console.log('Pos', pos)
+
     function onMouseMoveHandler(e) {
-        console.log('onMouseMoveHandler', e)
+        // console.log('onMouseMoveHandler', e)
+
+        setPos({x: e.x, y: e.y})
     }
 
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
-            <Canvas width={600} height={400}>
-                <Draggable onMouseMoveHandler={onMouseMoveHandler} />
+            <Canvas width={600} height={400} pointer={pos}>
                 <Rect 
-                    x = {0}
-                    y = {0}
+                    x = {pos.x}
+                    y = {pos.x}
                     width={600}
                     height={400}               
                 />
                 <Image 
-                    x = {0}
-                    y = {0}
+                    x = {pos.x}
+                    y = {pos.x}
                     source = {{uri: image_url}}
                 />
                 {

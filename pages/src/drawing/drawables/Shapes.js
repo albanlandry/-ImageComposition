@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -13,29 +13,6 @@ const Rect = (props) => {
     const fillStyle = props.fillStyle || '#FF0000';
     const ctx = props.context;
 
-    // Drawing after the component is mounted
-    useEffect(() => {
-        /**
-         * 
-         * @param {*} context - The 2D context 
-         */
-        const draw = (context) => {
-            if(!context) return;
-
-            ctx.save();
-
-            context.beginPath();
-            context.fillStyle = fillStyle;
-            context.rect(x, y, width, height);
-            context.fill();
-
-            context.restore();
-        };
-
-        // Calling the draw function of the component
-        draw(ctx);
-    })
-
     return null;
 };
 
@@ -47,35 +24,8 @@ const Rect = (props) => {
 const Image = (props) => {
     const uri = props.source.uri;
     const ctx = props.context;
-    const x = props.x || 0;
-    const y = props.y || 0;
-
-    console.log(props.x, props.y);
-
-    useEffect(() => {
-        /**
-         * 
-         * @param {*} context - The 2D context 
-         */
-         const draw = (context) => {
-            if(!context) return;
-
-            ctx.save();
-            context.drawImage(image, x, y);
-
-            context.restore();
-        };
-
-        // The code starts here
-        // create the image that will be displayed
-        const image = new window.Image();
-        image.src = uri;
-        image.onload = (e) => {
-            // Calling the draw function of the component
-            draw(ctx);
-        };
-
-    }, [props.source, props.x, props.y])
+    const [x, setX] = useState(props.x || 0);
+    const [y, setY] = useState(props.y || 0);
 
     return null;
 };

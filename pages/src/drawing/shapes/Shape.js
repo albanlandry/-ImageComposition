@@ -13,12 +13,103 @@ class Bound {
  * 
  */
 class Shape {
-    constructor() {
+    constructor(options) {
         this.pos = new Victor();
         this.bounds = new Bound();
+        this.zIndex =options?.index || 0;
     }
 
     computeBounds() {
         throw new Error('computeBounds must be implemented by the child.');
     }
+
+    draw(context) {
+        throw new Error('computeBounds must be implemented by the child.');
+    }
 }
+
+/**
+ * 
+ */
+class Rect extends Shape {
+    constructor(options) {
+        super(options);
+
+        this.pos = new Victor(options?.x || 0, options?.y || 0);
+        this.width = options?.width || 0;
+        this.height = options?.height || 0;
+        this.computeBounds();
+    }
+
+    computeBounds() {
+        this.bounds = {x: this.pos.x, y: this.pos.y, width: this.width, height: this.height};
+        return this.bounds;
+    }
+
+    draw(context) {
+        if(!context) return;
+
+        context.save();
+
+        context.beginPath();
+        context.fillStyle = "#FF0964";
+        context.rect(this.pos.x, this.pos.y, this.bounds.width, this.bounds.height);
+        context.fill();
+        // context.closePath();
+
+        context.restore();
+    }
+}
+
+class Image extends Shape {
+    constructor(options) {        
+        super(options);
+        this.uri = options?.source?.uri || '';
+    }
+
+    /**
+     * 
+     * @returns 
+     */
+    computeBounds() {
+        this.bounds = {x: this.pos.x, y: this.pos.y, width: this.width, height: this.height};
+        return this.bounds;
+    }
+
+    /**
+     * 
+     * @param {*} context 
+     * @returns 
+     */
+    draw(context) {
+        if(!context) return;
+        
+        // We draw the image for the first time if the image property is not set and the uri is specified.
+        // Otherwise, we draw the image existing in memory.
+        if(!this.image && this.uri.trim().length > 0) {
+            this.image = new window.Image();
+
+            this.image.src = this.uri;
+            this.image.onload = (e) => {
+                // Calling the draw function of the component
+                this.drawImage(context);
+            };
+        } else if(this.image) {
+            this.drawImage(context);
+        }
+    }
+
+    /**
+     * 
+     * @param {*} context 
+     */
+    drawImage(context) {
+        if(!context) return;
+
+        context.save();
+        context.drawImage(this.image, this.pos.x, this.pos.y);
+        context.restore();
+    }
+}
+
+export { Rect, Image };

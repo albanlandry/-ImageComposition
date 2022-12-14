@@ -1,14 +1,65 @@
 import React, {useEffect, useRef, useState} from "react";
-import Victor from 'victor';
 import PropTypes from 'prop-types';
 import ShapeCreator from './shapes/ShapeCreator';
 import Scene from '../core/Drawing';
-import * as Tools from './tools/Tools';
+import MouseDragger from "../core/event/MouseDragger";
+import { isPointInRect } from "../core/DrawingUtils";
 // import { Stage, Layer, Star, Text } from 'react-konva';
 
 
 const CANVAS_DEFAULT_WIDTH = 300;
 const CANVAS_DEFAULT_HEIGHT = 150;
+
+/**
+ * 
+ * @param {*} canvas 
+ * @param {*} x 
+ * @param {*} y 
+ * @returns 
+ */
+const windowToCanvas = (canvas, x, y) => {
+    var bbox = canvas.getBoundingClientRect();
+
+    return { x: x - bbox.left * (canvas.width  / bbox.width),
+        y: y - bbox.top  * (canvas.height / bbox.height)
+    };
+};
+
+const Editor = { 
+    scene: new Scene(),
+    selection: null, // The list of object selected by the mouse
+    selectionDrawable: Object.assign({name: 'selection'}), 
+    mouse: null,
+    init: false,
+
+    // functions related to the editor
+    /**
+     * 
+     * @param {*} x 
+     * @param {*} y 
+     */
+    select: (x, y) => {
+        const selected = Editor.scene.children.filter(child => isPointInRect(child.computeBounds(), {x: x, y: y}));
+        
+        const minX =  Math.min(...selected.map(child => child.computeBounds().x));
+        const minY =  Math.min(...selected.map(child => child.computeBounds().y));
+        const width =  Math.max(...selected.map(child => child.computeBounds().width));
+        const height =  Math.max(...selected.map(child => child.computeBounds().height));
+
+        // console.log(minX, minY, width, height);
+
+        if(!Editor.selection) {
+            // Editor.selection = Editor.scene.
+        }
+    },
+
+    /**
+     * Free up space in memory.
+     */
+    free: () => {
+        Editor.mouse.removeListeners();
+    }
+};
 
 /**
  * 
@@ -20,124 +71,47 @@ const Canvas = (props) => {
     const canvasHeight = props.height || CANVAS_DEFAULT_HEIGHT;
     const canvasRef = useRef(null);
     const animationId = useRef(null);
-    const isDragging = useRef(false);
-    const [scene, setScene] = useState(new Scene());
 
     useEffect(() => {
         const cvs = canvasRef.current;
-        // console.log(props.children[1].type.name, props.children[1].props);
-        // Add the context property to each child component.
-        // Since the react components are sealed object, we cannot directly edit their properties.
-        // Thus, we need to clone the object with the additional property
-        // const res = Array(props.children).flat().map((child, id) => {
-        //     return React.cloneElement(child, {canvas: cvs, context: cvs.getContext('2d'), key: id});
-        // });
-        // setComponents(res)
-        
-        Array(props.children).flat()
-            .filter(child => child.type.name.toLowerCase() !== 'draggable')
-            .map(child => ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props)))
-            .forEach(child => scene.add(child));
-        
+        Editor.mouse = new MouseDragger();
 
         const render = () => {
             const context = cvs.getContext('2d');
 
             context.clearRect(0, 0, cvs.width, cvs.height);
-            scene.children.forEach(child => child.draw(context));
-            
-            console.log(scene.children[0].pos.x);
+            Editor.scene.children.forEach(child => child.draw(context));
 
             animationId.current = window.requestAnimationFrame(render);
         };
 
-        render();
+        // Filter and translate the canvas React children into drawble elements.
+        // Flatten the children in case they are nested within each other, filter them to remove
+        // those who are not drawble and convert the elements into drawable items.
+        if(!Editor.init) {
+            Array(props.children).flat()
+            .filter(child => child.type.name.toLowerCase() !== 'draggable')
+            .map(child => ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props)))
+            .forEach(child => Editor.scene.add(child));
+
+            initializeInput();
+            render();
+
+            Editor.init = true;
+        }
 
         return() => {
             window.cancelAnimationFrame(animationId.current);
         }
-    }, [props.pointer])
+    }, [])
     // Adding the canvas property to the children
 
-    /**
-     * 
-     */
-    useEffect(() => {
-        const cvs = canvasRef.current;
-
-        /**
-         * 
-         * @param {*} canvas 
-         * @param {*} x 
-         * @param {*} y 
-         * @returns 
-         */
-        const windowToCanvas = (canvas, x, y) => {
-            var bbox = canvas.getBoundingClientRect();
-
-            isDragging.current = true;
-
-            return { x: x - bbox.left * (canvas.width  / bbox.width),
-                y: y - bbox.top  * (canvas.height / bbox.height)
-            };
-        };
-
-        /**
-         * 
-         * @param {*} e 
-         */
-        const onMouseDownHandler = (e) => {
-            e.preventDefault();
-
-            const pos = windowToCanvas(cvs, e.clientX, e.clientY);
-
-            console.log(scene.children[0]);
-
-            scene.children[0].pos.x = pos.x;
-            scene.children[0].pos.y = pos.y;
-
-            if(props.onMouseDown) props.onMouseDown(windowToCanvas(cvs, e.clientX, e.clientY));
-
-            isDragging.current = true;
-        }
-
-        /**
-         * 
-         * @param {*} e 
-         */
-        const onMouseUpHandler = (e) => {
-            e.preventDefault();
-
-            if(props.onMouseUp) props.onMouseUp(windowToCanvas(cvs, e.clientX, e.clientY));
-
-            isDragging.current = false;
-        }
-
-        /**
-         * 
-         * @param {*} e 
-         */
-        const onMouseMoveHandler = (e) => {
-            e.preventDefault();
-
-            // console.log(e)
-
-            if(isDragging.current && props.onMouseMoveHandler) {
-                props.onMouseMoveHandler(windowToCanvas(cvs, e.clientX, e.clientY));
-            }
-        }
-
-        // Adding the event listeners related to the mouse events
-        window.addEventListener('mousedown', onMouseDownHandler)
-        window.addEventListener('mouseup', onMouseUpHandler)
-        window.addEventListener('mousemove', onMouseMoveHandler)
-
-        return () => {
-            window.removeEventListener('mousedown', onMouseDownHandler);
-            window.removeEventListener('mouseup', onMouseUpHandler);
-            window.removeEventListener('mousemove', onMouseMoveHandler);
-        }
-    }, [])  
+    const initializeInput = () => {
+        Editor.mouse.mouseDown.add((e) => {
+            const pos = windowToCanvas(canvasRef.current, e.x, e.y);
+            Editor.select(pos.x, pos.y);
+        });
+    }
 
     return (
         <canvas

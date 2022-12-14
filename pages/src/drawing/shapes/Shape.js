@@ -14,10 +14,16 @@ class Bound {
  */
 class Shape {
     constructor(options) {
-        this.pos = new Victor();
+        this._pos = new Victor();
         this.bounds = new Bound();
         this.zIndex =options?.index || 0;
     }
+
+    get pos() { return this._pos; }
+
+    set pos(value) { this._pos = value; }
+
+    // get bounds() { return this.bounds; }
 
     computeBounds() {
         throw new Error('computeBounds must be implemented by the child.');
@@ -35,14 +41,14 @@ class Rect extends Shape {
     constructor(options) {
         super(options);
 
-        this.pos = new Victor(options?.x || 0, options?.y || 0);
+        this._pos = new Victor(options?.x || 0, options?.y || 0);
         this.width = options?.width || 0;
         this.height = options?.height || 0;
         this.computeBounds();
     }
 
     computeBounds() {
-        this.bounds = {x: this.pos.x, y: this.pos.y, width: this.width, height: this.height};
+        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
         return this.bounds;
     }
 
@@ -51,11 +57,12 @@ class Rect extends Shape {
 
         context.save();
 
+        // console.log("drawing", this._pos)
         context.beginPath();
         context.fillStyle = "#FF0964";
-        context.rect(this.pos.x, this.pos.y, this.bounds.width, this.bounds.height);
+        context.rect(this._pos.x, this._pos.y, this.bounds.width, this.bounds.height);
         context.fill();
-        // context.closePath();
+        context.closePath();
 
         context.restore();
     }
@@ -72,7 +79,7 @@ class Image extends Shape {
      * @returns 
      */
     computeBounds() {
-        this.bounds = {x: this.pos.x, y: this.pos.y, width: this.width, height: this.height};
+        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
         return this.bounds;
     }
 
@@ -107,9 +114,47 @@ class Image extends Shape {
         if(!context) return;
 
         context.save();
-        context.drawImage(this.image, this.pos.x, this.pos.y);
+        context.drawImage(this.image, this._pos.x, this._pos.y);
         context.restore();
     }
 }
 
-export { Rect, Image };
+/**
+ * SelectionRect
+ */
+class SelectionRect extends Shape {
+    constructor(options) {
+        super(options);
+
+        this._pos = new Victor(options?.x || 0, options?.y || 0);
+        this.width = options?.width || 0;
+        this.height = options?.height || 0;
+        this.computeBounds();
+    }
+
+    computeBounds() {
+        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
+        return this.bounds;
+    }
+
+    /**
+     * 
+     * @param {*} context 
+     * @returns 
+     */
+    draw(context) {
+        if(!context) return;
+
+        context.save();
+
+        context.beginPath();
+        context.lineWidth = 2;
+        context.rect(this._pos.x, this._pos.y, this.bounds.width, this.bounds.height);
+        context.stroke();
+        context.closePath();
+
+        context.restore();
+    }
+}
+
+export { Rect, Image, SelectionRect };

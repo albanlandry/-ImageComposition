@@ -1,8 +1,7 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import Template from '../src/Template';
-import Canvas, {testering} from '../src/drawing/Canvas';
+import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
-import { Draggable } from '../src/drawing/drawables/Actions';
 
 
 /**
@@ -114,15 +113,23 @@ const Viewport = (props) => {
                 <Rect 
                     x = {pos.x}
                     y = {pos.x}
-                    width={600}
-                    height={400}               
+                    width={200}
+                    height={100}               
                 />
+                <Rect 
+                    x = {200}
+                    y = {200}
+                    width={100}
+                    height={100}               
+                />
+                {
+                /*
                 <Image 
                     x = {pos.x}
                     y = {pos.x}
                     source = {{uri: image_url}}
                 />
-                {
+                
                 /*
                     <Image 
                     x = {50}

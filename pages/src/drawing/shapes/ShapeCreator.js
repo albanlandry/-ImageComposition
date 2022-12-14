@@ -12,6 +12,10 @@ const ShapeCreator = {
         if(options.name.toLowerCase() === 'image') {
             return new Shapes.Image(options)
         }
+
+        if(options.name.toLowerCase() === 'selection') {
+            return new Shapes.SelectionRect(options)
+        }
     }
 };
 

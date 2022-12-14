@@ -28,9 +28,10 @@ const windowToCanvas = (canvas, x, y) => {
 const Editor = { 
     scene: new Scene(),
     selection: null, // The list of object selected by the mouse
-    selectionDrawable: Object.assign({name: 'selection'}), 
+    selectionDrawable: null, 
     mouse: null,
     init: false,
+    tool: null,
 
     // functions related to the editor
     /**
@@ -47,10 +48,15 @@ const Editor = {
         const height =  Math.max(...selected.map(child => child.computeBounds().height));
 
         // console.log(minX, minY, width, height);
+        Editor.selectionDrawable = ShapeCreator.getShape({name: 'selection', x: minX, y: minY, width: width, height: height});
 
-        if(!Editor.selection) {
-            // Editor.selection = Editor.scene.
+        if(Editor.selection) {
+            Editor.scene.remove(Editor.selection);   
         }
+
+        Editor.selection = Editor.scene.add(Editor.selectionDrawable);
+
+        console.log(Editor.selection,  Editor.scene.children)
     },
 
     /**

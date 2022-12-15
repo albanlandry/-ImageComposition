@@ -6,7 +6,7 @@ import EventEmitter from "./EventEmitter";
 function MouseDragger() {
     var self = this;
     this.drawingStarted = new EventEmitter();
-    this.drawingContinue = new EventEmitter();
+    this.dragging = new EventEmitter();
     this.drawingEnded = new EventEmitter();
     // this.mouseLeave = new EventEmitter();
     // this.mouseEntered = new EventEmitter();
@@ -48,7 +48,7 @@ function MouseDragger() {
     function onMouseMoveHandler(e) {
         self.mouseMove.emit({x: e.clientX, y: e.clientY});
 
-        if(self.isDragging) self.drawingContinue.emit({x: e.clientX, y: e.clientY});
+        if(self.isDragging) self.dragging.emit({x: e.clientX, y: e.clientY});
     }
 
     /**

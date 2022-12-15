@@ -109,7 +109,7 @@ const Viewport = (props) => {
 
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
-            <Canvas width={600} height={400} pointer={pos}>
+            <Canvas width={700} height={525} pointer={pos}>
                 <Rect 
                     x = {pos.x}
                     y = {pos.x}

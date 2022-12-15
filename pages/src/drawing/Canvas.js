@@ -1,11 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import PropTypes from 'prop-types';
 import ShapeCreator from './shapes/ShapeCreator';
-import Scene from '../core/Drawing';
 import MouseDragger from "../core/event/MouseDragger";
-import { isPointInRect } from "../core/DrawingUtils";
-// import { Stage, Layer, Star, Text } from 'react-konva';
-
+import Editor from './Editor';
+import * as Toolbox from './tools/Toolbox';
 
 const CANVAS_DEFAULT_WIDTH = 300;
 const CANVAS_DEFAULT_HEIGHT = 150;
@@ -25,48 +23,6 @@ const windowToCanvas = (canvas, x, y) => {
     };
 };
 
-const Editor = { 
-    scene: new Scene(),
-    selection: null, // The list of object selected by the mouse
-    selectionDrawable: null, 
-    mouse: null,
-    init: false,
-    tool: null,
-
-    // functions related to the editor
-    /**
-     * 
-     * @param {*} x 
-     * @param {*} y 
-     */
-    select: (x, y) => {
-        const selected = Editor.scene.children.filter(child => isPointInRect(child.computeBounds(), {x: x, y: y}));
-        
-        const minX =  Math.min(...selected.map(child => child.computeBounds().x));
-        const minY =  Math.min(...selected.map(child => child.computeBounds().y));
-        const width =  Math.max(...selected.map(child => child.computeBounds().width));
-        const height =  Math.max(...selected.map(child => child.computeBounds().height));
-
-        // console.log(minX, minY, width, height);
-        Editor.selectionDrawable = ShapeCreator.getShape({name: 'selection', x: minX, y: minY, width: width, height: height});
-
-        if(Editor.selection) {
-            Editor.scene.remove(Editor.selection);   
-        }
-
-        Editor.selection = Editor.scene.add(Editor.selectionDrawable);
-
-        console.log(Editor.selection,  Editor.scene.children)
-    },
-
-    /**
-     * Free up space in memory.
-     */
-    free: () => {
-        Editor.mouse.removeListeners();
-    }
-};
-
 /**
  * 
  * @param {*} props 
@@ -81,8 +37,14 @@ const Canvas = (props) => {
     useEffect(() => {
         const cvs = canvasRef.current;
         Editor.mouse = new MouseDragger();
+        Editor.setTool(new Toolbox.SelectionTool(Editor));
+        // Settomg the canvas for the editor
+        Editor.canvas = cvs;
 
-        const render = () => {
+        /**
+         * Render the canvas
+         */
+         const render = () => {
             const context = cvs.getContext('2d');
 
             context.clearRect(0, 0, cvs.width, cvs.height);
@@ -100,24 +62,19 @@ const Canvas = (props) => {
             .map(child => ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props)))
             .forEach(child => Editor.scene.add(child));
 
-            initializeInput();
-            render();
-
             Editor.init = true;
+
+            Editor.render();
         }
+
+        // Rendering the scene
+        // render();
 
         return() => {
             window.cancelAnimationFrame(animationId.current);
         }
     }, [])
     // Adding the canvas property to the children
-
-    const initializeInput = () => {
-        Editor.mouse.mouseDown.add((e) => {
-            const pos = windowToCanvas(canvasRef.current, e.x, e.y);
-            Editor.select(pos.x, pos.y);
-        });
-    }
 
     return (
         <canvas

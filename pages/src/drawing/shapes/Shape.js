@@ -146,9 +146,10 @@ class SelectionRect extends Shape {
         if(!context) return;
 
         context.save();
-
         context.beginPath();
-        context.lineWidth = 2;
+        context.lineWidth = 1;
+        context.setLineDash([10, 8]);
+        context.strokeStyle = "rgba(0, 0, 0, 0.9)"
         context.rect(this._pos.x, this._pos.y, this.bounds.width, this.bounds.height);
         context.stroke();
         context.closePath();

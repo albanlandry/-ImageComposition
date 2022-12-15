@@ -31,17 +31,6 @@ const MouseHandler = (props) => {
         // Add the context property to each child component.
         // Since the react components are sealed object, we cannot directly edit their properties.
         // Thus, we need to clone the object with the additional property
-        /*
-        let res;
-
-        if(res) {
-            res = Array(props.children).flat().map((child, id) => {
-                return React.cloneElement(child, {context: props.context, key: id});
-            });
-        }
-
-        setComponents(res)
-        */
 
         // Adding the event listeners related to the mouse events
         window.addEventListener('mousedown', onMouseDownHandler)
@@ -127,17 +116,6 @@ const Draggable = (props) => {
         // Add the context property to each child component.
         // Since the react components are sealed object, we cannot directly edit their properties.
         // Thus, we need to clone the object with the additional property
-        /*
-        let res;
-
-        if(res) {
-            res = Array(props.children).flat().map((child, id) => {
-                return React.cloneElement(child, {context: props.context, key: id});
-            });
-        }
-
-        setComponents(res)
-        */
 
         // Adding the event listeners related to the mouse events
         window.addEventListener('mousedown', onMouseDownHandler)
@@ -150,7 +128,6 @@ const Draggable = (props) => {
             window.removeEventListener('mousemove', onMouseMoveHandler);
         }
     }, [])
-
 
     // Adding the canvas property to the children
     return null;

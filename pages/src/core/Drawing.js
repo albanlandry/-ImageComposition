@@ -261,6 +261,7 @@ Chain.prototype = {
  */
 function Scene() {
     this.children = [];
+    this.childrenMap = {};
 }
 
 Scene.prototype.constructor = Scene;
@@ -287,8 +288,30 @@ Scene.prototype = {
         }
 
         this.children.push(child);
+        this.childrenMap[`${child.uuid}`] = child;
 
         return child.uuid;
+    },
+
+    get: function (uuid) {
+        /*
+        let index = -1;
+        let child = null;
+        
+        // We loop through the children looking for the child whose uuid is same as the given id
+        // We interrupt the loop if the child is found
+        for(let i = 0; i < this.children.length; i++) {
+            if(this.children[i].uuid === uuid) {
+                child = this.children[i];
+                index = i;
+
+                break;
+            }
+        }
+
+        return [child, index];
+        */
+       return this.childrenMap[`${uuid}`];
     },
 
     removeAt: function (pos) {
@@ -297,6 +320,12 @@ Scene.prototype = {
 
     remove: function (uuid) {
         this.children = this.children.filter((elem, index) => elem.uuid !== uuid);
+        delete this.childrenMap[`${uuid}`];
+    },
+
+    removeChild: function (child) {
+        this.children = this.children.filter((elem, index) => elem.uuid !== child.uuid);
+        delete this.childrenMap[`${child.uuid}`];
     },
 
     removeIn: function (bounds) {

@@ -67,9 +67,18 @@ function SelectionTool(editor, canvas) {
     const mouseDraggingUUID = editor.mouse.dragging.add(({x, y}) => {
         // console.log('mouseDragging', x, y, self.pos.x, self.pos.y);
         const pos = editor.pointToCanvas(x,  y);
+        let deltaX = editor.selectionDrawable._pos.x - pos.x;
+        let deltaY = editor.selectionDrawable._pos.y - pos.y;
 
-        switch(checkCorner(pos, 10, editor.selectionDrawable.computeBounds())) {
+        console.log(deltaX, deltaY);
+
+        switch(this.hit) {
             case 0:
+                editor.selectionDrawable._pos.x = pos.x;
+                editor.selectionDrawable._pos.y = pos.y;
+                // editor.selectionDrawable.width += deltaX;
+                // editor.selectionDrawable.height += deltaY; 
+                break;
             case 1:
             case 2:
             case 3:
@@ -78,13 +87,14 @@ function SelectionTool(editor, canvas) {
             case 6:
             case 7:
                 break;
-            default:
-                console.log('default', checkCorner(pos, 10, this.hit));
+            case -1:
                 editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
                 self.pos.x = x;
                 self.pos.y = y;
-                break;
+                break;   
         }
+
+        editor.render();
     });
 
     this.disable = () => {

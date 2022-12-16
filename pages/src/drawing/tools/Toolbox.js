@@ -1,5 +1,4 @@
-import Editor from "../Editor";
-
+import { isPointInRect, checkCorner, cursors } from '../../core/DrawingUtils';
 /**
  * 
  * @param {*} canvas 
@@ -55,6 +54,14 @@ function SelectionTool(editor, canvas) {
         // console.log('mouseUp', x, y)
     });
 
+    const mouseMoveUUID = editor.mouse.mouseMove.add(({x, y}) => {
+        const pos = editor.pointToCanvas(x,  y);
+
+        if(editor.selectionDrawable) {
+            editor.setCursor(cursors(checkCorner(pos, 10, editor.selectionDrawable.computeBounds())));
+        }
+    })
+
     const mouseDraggingUUID = editor.mouse.dragging.add(({x, y}) => {
         // console.log('mouseDragging', x, y, self.pos.x, self.pos.y);
         editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
@@ -65,6 +72,7 @@ function SelectionTool(editor, canvas) {
     this.disable = () => {
         editor.mouse.mouseDown.remove(mouseDownUUID);
         editor.mouse.mouseUp.remove(mouseUpUUID);
+        editor.mouse.mouseMove.remove(mouseMoveUUID);
         editor.mouse.dragging.remove(mouseDraggingUUID);
     }
 }

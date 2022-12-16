@@ -110,28 +110,27 @@ const Viewport = (props) => {
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
             <Canvas width={700} height={525} pointer={pos}>
+                <Image 
+                        x = {300}
+                        y = {100}
+                        source = {{uri: image_url}}
+                    />
+                <Rect 
+                    x = {200}
+                    y = {200}
+                    width={100}
+                    height={100}
+                    fillStyle = {"#4389aa"}               
+                />
                 <Rect 
                     x = {pos.x}
                     y = {pos.x}
                     width={200}
                     height={100}               
                 />
-                <Rect 
-                    x = {200}
-                    y = {200}
-                    width={100}
-                    height={100}               
-                />
-                {
+                {    
                 /*
                 <Image 
-                    x = {pos.x}
-                    y = {pos.x}
-                    source = {{uri: image_url}}
-                />
-                
-                /*
-                    <Image 
                     x = {50}
                     y = {50}
                     source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}

@@ -37,6 +37,8 @@ class SceneEditor {
         this.init = false,
         this.tool = null,
         this.canvas = null;
+        this.shouldSnap = false;
+        this.grid = {x: 10, y: 10}
 
         // functions related to the editor
         /**
@@ -74,15 +76,34 @@ class SceneEditor {
             this.render();
         },
 
+        /**
+         * 
+         * @param {*} xOffest 
+         * @param {*} yOffset 
+         * @param {*} windowX 
+         * @param {*} windowY 
+         */
         this.moveSelection = (xOffest, yOffset, windowX, windowY) => {
-            const canvasOffset = windowToCanvas(this.canvas, windowX, windowY);
+            let canvasOffset = windowToCanvas(this.canvas, windowX, windowY);
+            let self = this;
 
-            var self = this;
             this.selection.forEach(elem => {
                 let sel = self.scene.get(elem.uuid);
 
                 if(sel) {
-                    sel._pos = new Victor(canvasOffset.x - this.selectionDrawable.deltaX, canvasOffset.y - this.selectionDrawable.deltaY);
+                    let newX = canvasOffset.x - this.selectionDrawable.deltaX, // The new x position of the selection coordinates system after translationo
+                    newY = canvasOffset.y - this.selectionDrawable.deltaY, // The new y position of the selection coordinates system after translationo
+                    tx = sel.pos.x - this.selectionDrawable.pos.x, // The x position in the coordinates with respect to the selection drawable as the origin, 
+                    ty = sel.pos.y - this.selectionDrawable.pos.y; // The y position in the coordinates with respect to the selection drawable as the origin, 
+
+                    if(this.shouldSnap) {
+                        const snap = this.snapToGrid(canvasOffset.x, canvasOffset.y, this.grid.x, this.grid.y);
+                        newX = snap.x;
+                        newY = snap.y;
+                    }
+
+                    // We translate the position of the selected element inside the new coordinates system.
+                    sel._pos = new Victor(newX + tx, newY + ty);
                 }
             })
 
@@ -99,6 +120,10 @@ class SceneEditor {
         };
     }
 
+    /**
+     * 
+     * @param {*} tool 
+     */
     setTool(tool) {
         if(this.tool) this.tool.disable();
 
@@ -111,7 +136,8 @@ class SceneEditor {
         // Clear the background in order to remove all existing elements.
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.drawGrid(context, 'lightgray', 10, 10);
+        this.drawGrid(context, 'lightgray', this.grid.x, this.grid.y);
+        
         Editor.scene.children.forEach(child => child.draw(context));
 
         if(this.selectionDrawable) {
@@ -120,6 +146,13 @@ class SceneEditor {
         // animationId.current = window.requestAnimationFrame(render);
     }
 
+    /**
+     * 
+     * @param {*} context 
+     * @param {*} color 
+     * @param {*} stepx 
+     * @param {*} stepy 
+     */
     drawGrid(context, color, stepx, stepy) {
         context.save();
 
@@ -141,6 +174,39 @@ class SceneEditor {
         }
 
         context.restore();
+    }
+
+    /**
+     * 
+     * @param {*} x 
+     * @param {*} y 
+     * @returns 
+     */
+    pointToCanvas(x, y) {
+        return windowToCanvas(this.canvas, x, y);
+    }
+
+    /**
+     * 
+     * @param {*} cursor 
+     */
+    setCursor(cursor) {
+        this.canvas.style.cursor = cursor;
+    }
+
+    /**
+     * 
+     * @param {*} x 
+     * @param {*} y 
+     * @param {*} snapX 
+     * @param {*} snapY 
+     * @returns 
+     */
+    snapToGrid(x, y, snapX, snapY) {
+        const posX = Math.round(x / snapX) * snapX;
+        const posY = Math.round(y / snapY) * snapY;
+        
+        return {x: posX, y: posY};
     }
 };
 

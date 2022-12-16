@@ -43,6 +43,7 @@ function SelectionTool(editor, canvas) {
     this.pos = {x: 0, y: 0};
     this.isDragging;
     this.canvas = canvas;
+    this.hit = -1;
 
     const mouseDownUUID = editor.mouse.mouseDown.add(({x, y}) => {
         self.pos.x = x;
@@ -57,16 +58,33 @@ function SelectionTool(editor, canvas) {
     const mouseMoveUUID = editor.mouse.mouseMove.add(({x, y}) => {
         const pos = editor.pointToCanvas(x,  y);
 
-        if(editor.selectionDrawable) {
-            editor.setCursor(cursors(checkCorner(pos, 10, editor.selectionDrawable.computeBounds())));
+        if(editor.selectionDrawable && !editor.mouse.isDragging) {
+            this.hit = checkCorner(pos, 10, editor.selectionDrawable.computeBounds());
+            editor.setCursor(cursors(this.hit));
         }
     })
 
     const mouseDraggingUUID = editor.mouse.dragging.add(({x, y}) => {
         // console.log('mouseDragging', x, y, self.pos.x, self.pos.y);
-        editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
-        self.pos.x = x;
-        self.pos.y = y;
+        const pos = editor.pointToCanvas(x,  y);
+
+        switch(checkCorner(pos, 10, editor.selectionDrawable.computeBounds())) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                break;
+            default:
+                console.log('default', checkCorner(pos, 10, this.hit));
+                editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
+                self.pos.x = x;
+                self.pos.y = y;
+                break;
+        }
     });
 
     this.disable = () => {

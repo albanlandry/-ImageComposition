@@ -55,11 +55,17 @@ class SceneEditor {
             const width = Math.max(...selected.map(child => child.computeBounds().width));
             const height = Math.max(...selected.map(child => child.computeBounds().height));
 
+            console.log('Select', x, y)
+            this.selectionDrawableUUID = null;
+            this.selectionDrawable = null;
+            this.selection = [];
+            /*
             if (this.selection) {
                 // this.scene.remove(this.selectionDrawableUUID);
                 this.selectionDrawableUUID = null;
                 this.selection = [];
             }
+            */
 
             if (selected.length > 0) {
                 this.selectionDrawable = ShapeCreator.getShape({ name: 'selection', x: minX, y: minY, width: width, height: height });

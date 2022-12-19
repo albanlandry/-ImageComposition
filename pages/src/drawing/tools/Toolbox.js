@@ -70,8 +70,6 @@ function SelectionTool(editor, canvas) {
         let deltaX = editor.selectionDrawable._pos.x - pos.x;
         let deltaY = editor.selectionDrawable._pos.y - pos.y;
 
-        console.log(deltaX, deltaY);
-
         switch(this.hit) {
             case 0:
                 editor.selectionDrawable._pos.x = pos.x;

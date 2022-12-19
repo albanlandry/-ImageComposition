@@ -61,4 +61,27 @@ function MouseDragger() {
     }
 }
 
-export default MouseDragger;
+/**
+ * Handle events related to the keyboard
+ * @param {*} options 
+ */
+function KeyboardManager(options) {
+    var self = this;
+    this.keyDown = new EventEmitter();
+    this.keyUp = new EventEmitter();
+
+    function onKeyDown(e) {
+
+    }
+
+    /**
+     * Key up handler
+     * @param {*} e 
+     */
+    function onKeyUp(e) {
+
+    }
+}
+
+
+export {KeyboardManager, MouseDragger};

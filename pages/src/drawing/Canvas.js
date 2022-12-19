@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import PropTypes from 'prop-types';
 import ShapeCreator from './shapes/ShapeCreator';
-import MouseDragger from "../core/event/MouseDragger";
+import { MouseDragger } from "../core/event/Managers";
 import Editor from './Editor';
 import * as Toolbox from './tools/Toolbox';
 

@@ -38,7 +38,7 @@ class SceneEditor {
         this.tool = null,
         this.canvas = null;
         this.shouldSnap = false;
-        this.grid = {x: 10, y: 10}
+        this.grid = {x: 8, y: 8}
 
         // functions related to the editor
         /**
@@ -55,7 +55,6 @@ class SceneEditor {
             const width = Math.max(...selected.map(child => child.computeBounds().width));
             const height = Math.max(...selected.map(child => child.computeBounds().height));
 
-            console.log('Select', x, y)
             this.selectionDrawableUUID = null;
             this.selectionDrawable = null;
             this.selection = [];
@@ -103,7 +102,8 @@ class SceneEditor {
                     ty = sel.pos.y - this.selectionDrawable.pos.y; // The y position in the coordinates with respect to the selection drawable as the origin, 
 
                     if(this.shouldSnap) {
-                        const snap = this.snapToGrid(canvasOffset.x, canvasOffset.y, this.grid.x, this.grid.y);
+                        console.log(newX, newY, this.snapToGrid(newX, newY, this.grid.x, this.grid.y));
+                        const snap = this.snapToGrid(newX, newY, this.grid.x, this.grid.y);
                         newX = snap.x;
                         newY = snap.y;
                     }

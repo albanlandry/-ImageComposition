@@ -10,21 +10,6 @@ const CANVAS_DEFAULT_HEIGHT = 150;
 
 /**
  * 
- * @param {*} canvas 
- * @param {*} x 
- * @param {*} y 
- * @returns 
- */
-const windowToCanvas = (canvas, x, y) => {
-    var bbox = canvas.getBoundingClientRect();
-
-    return { x: x - bbox.left * (canvas.width  / bbox.width),
-        y: y - bbox.top  * (canvas.height / bbox.height)
-    };
-};
-
-/**
- * 
  * @param {*} props 
  * @returns 
  */
@@ -38,8 +23,7 @@ const Canvas = (props) => {
         const cvs = canvasRef.current;
         Editor.mouse = new MouseDragger();
         Editor.setTool(new Toolbox.SelectionTool(Editor));
-        // Settomg the canvas for the editor
-        Editor.canvas = cvs;
+        Editor.canvas = cvs; // Setting the canvas for the editor
 
         /**
          * Render the canvas
@@ -59,7 +43,10 @@ const Canvas = (props) => {
         if(!Editor.init) {
             Array(props.children).flat()
             .filter(child => child.type.name.toLowerCase() !== 'draggable')
-            .map(child => ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props)))
+            .map(child => {
+
+                return ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props))
+            })
             .forEach(child => Editor.scene.add(child));
 
             Editor.init = true;

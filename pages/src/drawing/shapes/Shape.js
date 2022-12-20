@@ -6,6 +6,8 @@ class Bound {
         this.y = 0;
         this.width = 0;
         this.height = 0;
+        this.min = {x: this.x, y: this.y};
+        this.max = {x: this.x + this.width, y: this.y + this.height};
     }
 }
 
@@ -14,7 +16,9 @@ class Bound {
  */
 class Shape {
     constructor(options) {
-        this._pos = new Victor();
+        this._pos = new Victor(options?.x || 0, options?.y || 0);
+        this.width = options?.width || 0;
+        this.height = options?.height || 0;
         this.bounds = new Bound();
         this.zIndex =options?.index || 0;
     }
@@ -26,7 +30,10 @@ class Shape {
     // get bounds() { return this.bounds; }
 
     computeBounds() {
-        throw new Error('computeBounds must be implemented by the child.');
+        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
+        this.bounds.min = {x: this._pos.x, y: this._pos.y};
+        this.bounds.max = {x: this._pos.x + this.width, y: this._pos.y + this.height};
+        return this.bounds;
     }
 
     draw(context) {
@@ -128,16 +135,8 @@ class SelectionRect extends Shape {
     constructor(options) {
         super(options);
 
-        this._pos = new Victor(options?.x || 0, options?.y || 0);
-        this.width = options?.width || 0;
-        this.height = options?.height || 0;
         this.computeBounds();
         this.handleRadius = 4;
-    }
-
-    computeBounds() {
-        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
-        return this.bounds;
     }
 
     /**
@@ -173,7 +172,7 @@ class SelectionRect extends Shape {
         context.lineWidth = 1;
         context.setLineDash([10, 6, 6]);
         context.strokeStyle = "rgba(0, 0, 0, 0.8)"
-        context.rect(this._pos.x, this._pos.y, this.bounds.width, this.bounds.height);
+        context.rect(this._pos.x, this._pos.y, this.width, this.height);
         context.stroke();
         context.closePath();
 
@@ -182,18 +181,18 @@ class SelectionRect extends Shape {
         this.drawHandle(context, this.pos.x, this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
         // middle-top handle
-        this.drawHandle(context, (this.pos.x + this.bounds.width/2) - (this.handleRadius / 2), this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
+        this.drawHandle(context, (this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
         // Top-right handle
-        this.drawHandle(context, this.pos.x + this.bounds.width, this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
+        this.drawHandle(context, this.pos.x + this.width, this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
-        this.drawHandle(context, this.pos.x, this.pos.y + this.bounds.height, this.handleRadius, 0, 2 * Math.PI, false);
+        this.drawHandle(context, this.pos.x, this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
 
         // middle-bottom handle
-        this.drawHandle(context, (this.pos.x + this.bounds.width/2) - (this.handleRadius / 2), this.pos.y + this.bounds.height, this.handleRadius, 0, 2 * Math.PI, false);
+        this.drawHandle(context, (this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
 
         // bottom-right handle
-        this.drawHandle(context, this.pos.x + this.bounds.width, this.pos.y + this.bounds.height, this.handleRadius, 0, 2 * Math.PI, false);
+        this.drawHandle(context, this.pos.x + this.width, this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
 
         context.restore();
     }

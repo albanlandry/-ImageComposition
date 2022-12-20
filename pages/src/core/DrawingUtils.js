@@ -61,8 +61,8 @@ function checkCorner(mouse, threshold, bounds) {
    // Corners coordinates 
    const topLeftBounds = { x: bounds.x - sensitiveArea, y: bounds.y - sensitiveArea, width: threshold, height: threshold };
    const topRightBounds = { x: cWidth - sensitiveArea, y: bounds.y - sensitiveArea, width: threshold, height: threshold };
-   const bottomRightBounds = { x: bounds.x - sensitiveArea, y: cHeight - sensitiveArea, width: threshold, height: threshold };
-   const bottomLeftBounds = { x: cWidth - sensitiveArea, y: cHeight - sensitiveArea, width: threshold, height: threshold };
+   const bottomLeftBounds = { x: bounds.x - sensitiveArea, y: cHeight - sensitiveArea, width: threshold, height: threshold };
+   const bottomRightBounds = { x: cWidth - sensitiveArea, y: cHeight - sensitiveArea, width: threshold, height: threshold };
    const middleTop = { x: midWith - sensitiveArea, y: bounds.y - sensitiveArea, width: threshold, height: threshold } , 
    middleBottom = { x: midWith - sensitiveArea, y: cHeight - sensitiveArea, width: threshold, height: threshold }, 
    middleLeft = { x: bounds.x - sensitiveArea, y: midHeight - sensitiveArea, width: threshold, height: threshold }, 
@@ -77,11 +77,11 @@ function checkCorner(mouse, threshold, bounds) {
        hit = 1;
    }
 
-   if (isPointInRect(bottomRightBounds, new Victor(mouse.x, mouse.y))) {
+   if (isPointInRect(bottomLeftBounds, new Victor(mouse.x, mouse.y))) {
        hit = 2;
    }
        
-   if (isPointInRect(bottomLeftBounds, new Victor(mouse.x, mouse.y))) {
+   if (isPointInRect(bottomRightBounds, new Victor(mouse.x, mouse.y))) {
        hit = 3;
    }
 

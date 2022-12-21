@@ -118,7 +118,13 @@ const Viewport = (props) => {
      * @param {*} e 
      */
     const onDrop= (e) =>{
-        console.log('onDrop...')
+        // e.dataTransfer.setData("text/uri-list", items[index].thumbnail);
+        // e.dataTransfer.setData("text/plain", items[index].thumbnail);
+        let url = e.dataTransfer.getData("text/uri-list");
+
+        if(!url) url = e.dataTransfer.getData("text/plain");
+
+        console.log('onDrop...', url)
     };
 
     /**
@@ -198,7 +204,6 @@ const SideMenu = (props) => {
         e.target.classList.add("opacity-60");
 
         // Data transfer
-        console.log(items[index].thumbnail);
         e.dataTransfer.setData("text/uri-list", items[index].thumbnail);
         e.dataTransfer.setData("text/plain", items[index].thumbnail);
     };

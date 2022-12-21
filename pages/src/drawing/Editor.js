@@ -58,6 +58,7 @@ class SceneEditor {
             this.selectionDrawableUUID = null;
             this.selectionDrawable = null;
             this.selection = [];
+
             /*
             if (this.selection) {
                 // this.scene.remove(this.selectionDrawableUUID);
@@ -198,6 +199,16 @@ class SceneEditor {
      */
     setCursor(cursor) {
         this.canvas.style.cursor = cursor;
+    }
+
+    /**
+     * 
+     * @param {*} oldDim 
+     * @param {*} newDim 
+     */
+    resizeSelection(dx, dy) {
+        // console.log(`Delta (x: ${dx}, y: ${dy})`);
+        this.render();
     }
 
     /**

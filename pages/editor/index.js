@@ -4,6 +4,10 @@ import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
 
 
+const Configs = {
+
+};
+
 /**
  * 
  */
@@ -99,45 +103,65 @@ const Viewport = (props) => {
     const shapes = generate_rects(20);
     const [pos, setPos] = useState({x: 0, y: 0});
 
-    // console.log('Pos', pos)
-
+    /**
+     * 
+     * @param {*} e 
+     */
     function onMouseMoveHandler(e) {
         // console.log('onMouseMoveHandler', e)
 
         setPos({x: e.x, y: e.y})
     }
 
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDrop= (e) =>{
+        console.log('onDrop...')
+    };
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDragEnter = (e) =>{
+        console.log('onDragEnter...')
+    };
+
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
-            <Canvas width={700} height={525} pointer={pos}>
-                <Image 
-                        x = {300}
-                        y = {100}
-                        source = {{uri: image_url}}
+            <div onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
+                <Canvas width={700} height={525} pointer={pos}>
+                    {
+                    /*
+                    <Image 
+                            x = {300}
+                            y = {100}
+                            source = {{uri: image_url}}
+                        />
+                    <Rect 
+                        x = {200}
+                        y = {200}
+                        width={100}
+                        height={100}
+                        fillStyle = {"#4389aa"}               
                     />
-                <Rect 
-                    x = {200}
-                    y = {200}
-                    width={100}
-                    height={100}
-                    fillStyle = {"#4389aa"}               
-                />
-                <Rect 
-                    x = {pos.x}
-                    y = {pos.x}
-                    width={200}
-                    height={100}               
-                />
-                {    
-                /*
-                <Image 
-                    x = {50}
-                    y = {50}
-                    source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}
-                />
-                */
-                }
-            </Canvas>
+                    <Rect 
+                        x = {pos.x}
+                        y = {pos.x}
+                        width={200}
+                        height={100}               
+                    />
+                    <Image 
+                        x = {50}
+                        y = {50}
+                        source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}
+                    />
+                    */
+                    }
+                </Canvas>
+            </div>
         </div>
     )
 };
@@ -164,8 +188,45 @@ const SideMenu = (props) => {
         {label: "images 3", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.aZ3vzsdzZcLc0brFCniaRgHaE8%26pid%3DApi&f=1&ipt=522e4e4751f59c87589e6fdf991c3b52bb642da9a8dc1d89286e00c07078d054&ipo=images"},
     ]
 
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDragStart = (index, e) => {
+        console.log('onDragStart...');
+        e.target.classList.add("opacity-60");
+
+        // Data transfer
+        console.log(items[index].thumbnail);
+        e.dataTransfer.setData("text/uri-list", items[index].thumbnail);
+        e.dataTransfer.setData("text/plain", items[index].thumbnail);
+    };
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDrag = (e) => {
+        console.log('onDrag...');
+    };
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDragEnd = (e) => {
+        console.log('onDragEnd...');
+        e.target.classList.remove("opacity-60");
+    };
+
     const children = items.map((item, index) => {
-        return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]">
+        return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]"
+            draggable={true}
+            onDrag={onDrag}
+            onDragStart={onDragStart.bind(this, index)}
+            onDragEnd={onDragEnd}
+            >
             <Thumbnail src={item.thumbnail} label={item.label} />
         </li>
     })

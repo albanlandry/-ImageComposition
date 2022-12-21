@@ -40,19 +40,20 @@ const Canvas = (props) => {
         // Filter and translate the canvas React children into drawble elements.
         // Flatten the children in case they are nested within each other, filter them to remove
         // those who are not drawble and convert the elements into drawable items.
-        if(!Editor.init) {
+        
+        if(!Editor.init && props.children) {
             Array(props.children).flat()
-            .filter(child => child.type.name.toLowerCase() !== 'draggable')
+            .filter(child => child?.type.name.toLowerCase() !== 'draggable')
             .map(child => {
 
-                return ShapeCreator.getShape(Object.assign({name: child.type.name}, child.props))
+                return ShapeCreator.getShape(Object.assign({name: child?.type.name}, child?.props))
             })
             .forEach(child => Editor.scene.add(child));
 
             Editor.init = true;
-
-            Editor.render();
         }
+
+        Editor.render();
 
         // Rendering the scene
         // render();

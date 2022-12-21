@@ -1,4 +1,6 @@
 import { isPointInRect, checkCorner, cursors } from '../../core/DrawingUtils';
+import nj from 'numjs';
+
 /**
  * 
  * @param {*} canvas 
@@ -64,6 +66,16 @@ function SelectionTool(editor, canvas) {
         }
     })
 
+    /*
+    let transform = nj.array([[1, 0], [0, 1], [5, 4]]);
+    const scale = nj.array([[2, 0], [0, 2]])
+
+    transform = transform.dot(scale);
+
+    const vector = nj.array([[2, 2, 1]]);
+    console.log("NP", nj.dot(vector, transform));
+    */
+
     const mouseDraggingUUID = editor.mouse.dragging.add(({x, y}) => {
         // console.log('mouseDragging', x, y, self.pos.x, self.pos.y);
         if(!editor.selectionDrawable) return;
@@ -73,12 +85,26 @@ function SelectionTool(editor, canvas) {
         let deltaX = editor.selectionDrawable._pos.x - pos.x;
         let deltaY = editor.selectionDrawable._pos.y - pos.y;
 
+        // Translatiion parameters
+        let posX = 0;
+        let posY = 0;
+
+        // If the hit is -1, it means that no sensitive area was hit by the cursor.
+        // In this case, it means that the user is either trying to move the selection or the cursor is outside of the selection.
+        if(this.hit === -1) {
+            editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
+            self.pos.x = x;
+            self.pos.y = y;
+
+            return;
+        }
+
         switch(this.hit) {
             case 0: // Top-left
                 editor.selectionDrawable._pos.x = pos.x;
                 editor.selectionDrawable._pos.y = pos.y;
                 editor.selectionDrawable.width += deltaX;
-                editor.selectionDrawable.height += deltaY; 
+                editor.selectionDrawable.height += deltaY;
                 break;
             case 1: // Top-right
                 deltaX = pos.x - bounds.max.x;
@@ -113,15 +139,10 @@ function SelectionTool(editor, canvas) {
             case 7: // Middle-left
                 editor.selectionDrawable._pos.x = pos.x;
                 editor.selectionDrawable.width += deltaX;
-                break;
-            case -1:
-                editor.moveSelection(x - self.pos.x, y - self.pos.y, x, y)
-                self.pos.x = x;
-                self.pos.y = y;
-                break;   
+                break;  
         }
 
-        editor.render();
+        editor.resizeSelection(deltaX, deltaY);
     });
 
     this.disable = () => {

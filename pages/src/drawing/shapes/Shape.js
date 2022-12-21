@@ -170,29 +170,50 @@ class SelectionRect extends Shape {
         context.save();
         context.beginPath();
         context.lineWidth = 1;
-        context.setLineDash([10, 6, 6]);
+        context.setLineDash([8, 4, 4]);
         context.strokeStyle = "rgba(0, 0, 0, 0.8)"
         context.rect(this._pos.x, this._pos.y, this.width, this.height);
         context.stroke();
         context.closePath();
 
         // Drawing Handles
+
+        // Rotation handle
+        // Straight line handle
+        context.save();
+        context.setLineDash([0]);
+        context.beginPath();
+        context.moveTo((this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y - this.handleRadius * 5);
+        context.lineTo((this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y);
+        context.stroke();
+        context.restore();
+        
+        // Drawing the location handle
+        this.drawHandle(context, (this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y - this.handleRadius * 5, this.handleRadius, 0, 2 * Math.PI, false);
+        
         // Top-left handle
         this.drawHandle(context, this.pos.x, this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
-        // middle-top handle
+        // Middle-top handle
         this.drawHandle(context, (this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
         // Top-right handle
         this.drawHandle(context, this.pos.x + this.width, this.pos.y, this.handleRadius, 0, 2 * Math.PI, false);
 
+        // Bottom-left handle
         this.drawHandle(context, this.pos.x, this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
 
-        // middle-bottom handle
+        // Middle-bottom handle
         this.drawHandle(context, (this.pos.x + this.width/2) - (this.handleRadius / 2), this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
 
         // bottom-right handle
         this.drawHandle(context, this.pos.x + this.width, this.pos.y + this.height, this.handleRadius, 0, 2 * Math.PI, false);
+
+        // Middle-left handle
+        this.drawHandle(context, this.pos.x, this.pos.y + this.height/2, this.handleRadius, 0, 2 * Math.PI, false);
+
+        // Middle-right handle
+        this.drawHandle(context, this.pos.x + this.width, this.pos.y + this.height/2, this.handleRadius, 0, 2 * Math.PI, false);
 
         context.restore();
     }

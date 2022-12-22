@@ -20,7 +20,8 @@ class Shape {
         this.width = options?.width || 0;
         this.height = options?.height || 0;
         this.bounds = new Bound();
-        this.zIndex =options?.index || 0;
+        this.zIndex =options?.zIndex || 0;
+        this.uuid = options?.uuid || 0;
     }
 
     get pos() { return this._pos; }

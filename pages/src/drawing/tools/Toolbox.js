@@ -84,6 +84,7 @@ function SelectionTool(editor, canvas) {
         const bounds = editor.selectionDrawable.computeBounds();
         let deltaX = editor.selectionDrawable._pos.x - pos.x;
         let deltaY = editor.selectionDrawable._pos.y - pos.y;
+        const drawableCopy = JSON.parse(JSON.stringify(editor.selectionDrawable)); // Make a copy of the drawable in case we need it later for computation
 
         // Translatiion parameters
         let posX = 0;
@@ -141,6 +142,10 @@ function SelectionTool(editor, canvas) {
                 editor.selectionDrawable.width += deltaX;
                 break;  
         }
+
+        let scale = [[pos.y / drawableCopy._pos.y, 0], [0, pos.x / drawableCopy._pos.x]]
+
+        console.log(pos.x / drawableCopy._pos.x)
 
         editor.resizeSelection(deltaX, deltaY);
     });

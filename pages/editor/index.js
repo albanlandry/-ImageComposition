@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import Template from '../src/Template';
 import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
-
+import { v4 as uuidv4 } from 'uuid';
+import { windowToCanvas } from '../src/drawing/CanvasUtils';
 
 const Configs = {
 
@@ -102,6 +103,9 @@ const generate_rects = (count) => {
 const Viewport = (props) => {
     const shapes = generate_rects(20);
     const [pos, setPos] = useState({x: 0, y: 0});
+    const [children, setChildren] = useState([]);
+    const [dimens, setDimens] = useState([700, 525]);
+    const canvasRef = useRef(null);
 
     /**
      * 
@@ -124,6 +128,20 @@ const Viewport = (props) => {
 
         if(!url) url = e.dataTransfer.getData("text/plain");
 
+        children.push(                    
+            <Image
+                zIndex={children.length + 1}
+                key={children.length}
+                x = {0}
+                y = {0}
+                source = {{uri: url}}
+                uuid={uuidv4()}
+            />)
+
+        e.dataTransfer.setData("text/uri-list", null);
+        e.dataTransfer.setData("text/plain", null);
+
+        setChildren([...children]);
         console.log('onDrop...', url)
     };
 
@@ -135,11 +153,16 @@ const Viewport = (props) => {
         console.log('onDragEnter...')
     };
 
+    const onCanvasReady = (canvas) =>{
+        canvasRef.current = canvas;
+    }
+
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
             <div onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
-                <Canvas width={700} height={525} pointer={pos}>
+                <Canvas width={dimens[0]} height={dimens[1]} pointer={pos} onCanvasReady={onCanvasReady}>
                     {
+                        children
                     /*
                     <Image 
                             x = {300}
@@ -192,6 +215,9 @@ const SideMenu = (props) => {
         {label: "images 1", thumbnail: "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4="},
         {label: "images 2", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"},
         {label: "images 3", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.aZ3vzsdzZcLc0brFCniaRgHaE8%26pid%3DApi&f=1&ipt=522e4e4751f59c87589e6fdf991c3b52bb642da9a8dc1d89286e00c07078d054&ipo=images"},
+        {label: "images 5", thumbnail: "https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/6007/dog-clipart-md.png"},
+        {label: "Falling snow", thumbnail: "https://pngimg.com/uploads/snow/snow_PNG27.png"},
+        {label: "Sun Rays", thumbnail: "https://www.clipartmax.com/png/full/79-795646_art-clipart-transparent-background-sun-rays-clipart.png"},
     ]
 
 

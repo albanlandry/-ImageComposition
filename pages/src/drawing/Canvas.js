@@ -41,27 +41,30 @@ const Canvas = (props) => {
         // Flatten the children in case they are nested within each other, filter them to remove
         // those who are not drawble and convert the elements into drawable items.
         
-        if(!Editor.init && props.children) {
+        if([props.children].flat().length > 0) {
             Array(props.children).flat()
             .filter(child => child?.type.name.toLowerCase() !== 'draggable')
-            .map(child => {
+            .map((child, index) => {
+                if(!child.props.zIndex) child.props.zIndex = index + 1;
 
                 return ShapeCreator.getShape(Object.assign({name: child?.type.name}, child?.props))
             })
             .forEach(child => Editor.scene.add(child));
 
-            Editor.init = true;
+            // Editor.init = true;
         }
 
         Editor.render();
 
+        // Send the canvas to the user
+        if(props.onCanvasReady) props.onCanvasReady(cvs);
         // Rendering the scene
         // render();
 
         return() => {
             window.cancelAnimationFrame(animationId.current);
         }
-    }, [])
+    }, [props.children])
     // Adding the canvas property to the children
 
     return (

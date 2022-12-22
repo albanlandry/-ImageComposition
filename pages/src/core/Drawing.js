@@ -287,6 +287,8 @@ Scene.prototype = {
             child.draw = draw;
         }
 
+        if(this.children.find(elem => elem.uuid === child.uuid)) return; 
+
         this.children.push(child);
         this.childrenMap[`${child.uuid}`] = child;
 

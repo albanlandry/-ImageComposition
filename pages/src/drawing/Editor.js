@@ -48,12 +48,7 @@ class SceneEditor {
          */
         this.select = (x, y) => {
             const canvasOffset = windowToCanvas(this.canvas, x, y);
-            const selected = Editor.scene.children.filter(child => isPointInRect(child.computeBounds(), { x: canvasOffset.x, y: canvasOffset.y }) && !(child instanceof SelectionRect));
-
-            const minX = Math.min(...selected.map(child => child.computeBounds().x));
-            const minY = Math.min(...selected.map(child => child.computeBounds().y));
-            const width = Math.max(...selected.map(child => child.computeBounds().width));
-            const height = Math.max(...selected.map(child => child.computeBounds().height));
+            let selected = Editor.scene.children.filter(child => isPointInRect(child.computeBounds(), { x: canvasOffset.x, y: canvasOffset.y }) && !(child instanceof SelectionRect));
 
             this.selectionDrawableUUID = null;
             this.selectionDrawable = null;
@@ -68,6 +63,13 @@ class SceneEditor {
             */
 
             if (selected.length > 0) {
+                selected = [selected.sort((a, b) => { return b.zIndex - a.zIndex; })[0]] ;
+
+                const minX = Math.min(...selected.map(child => child.computeBounds().x));
+                const minY = Math.min(...selected.map(child => child.computeBounds().y));
+                const width = Math.max(...selected.map(child => child.computeBounds().width));
+                const height = Math.max(...selected.map(child => child.computeBounds().height));
+
                 this.selectionDrawable = ShapeCreator.getShape({ name: 'selection', x: minX, y: minY, width: width, height: height });
                 // this.selectionDrawableUUID = this.scene.add(this.selectionDrawable);
                 this.selection = selected;

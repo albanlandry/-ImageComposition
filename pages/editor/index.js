@@ -248,8 +248,45 @@ const SideMenu = (props) => {
      */
     const onDragEnd = (e) => {
         console.log('onDragEnd...');
-        e.target.classList.remove("opacity-60");
+        // e.target.classList.remove("opacity-60");
     };
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDragOver = (e) => {
+        e.preventDefault();
+
+        console.log(e.target);
+        e.target.classList.add("opacity-40");
+        e.target.classList.add("border-b-4");
+        e.target.classList.add("border-blue-400");
+        // e.target.classList.add("bg-sky-200");
+    }
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDragLeave = (e) => {
+        e.target.classList.remove("opacity-40");
+        e.target.classList.remove("border-b-4");
+        e.target.classList.remove("border-blue-400");
+        e.preventDefault();
+    }
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const onDrop = (e) => {
+        e.preventDefault();
+        e.target.classList.remove("opacity-40");
+        e.target.classList.remove("border-b-4");
+        e.target.classList.remove("border-blue-400");
+        console.log('onDrop', e.target);
+    }
 
     const children = items.map((item, index) => {
         return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]"
@@ -263,7 +300,7 @@ const SideMenu = (props) => {
     })
 
     return (
-        <ul>
+        <ul onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} className="max-h-full overflow-y-auto">
             {children}
         </ul>
     )

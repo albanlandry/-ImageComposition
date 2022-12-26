@@ -3,6 +3,7 @@ import {SelectionRect} from './shapes/Shape';
 import Scene from '../core/Drawing';
 import { isPointInRect } from "../core/DrawingUtils";
 import Victor from 'victor';
+import nj from 'numjs';
 
 /**
  * 
@@ -208,8 +209,22 @@ class SceneEditor {
      * @param {*} oldDim 
      * @param {*} newDim 
      */
-    resizeSelection(dx, dy) {
+    resizeSelection(t1, t2) {
         // console.log(`Delta (x: ${dx}, y: ${dy})`);
+        if(this.selection && this.selection.length > 0) {
+            const bounds = this.selection[0].computeBounds();
+            const newPos1 = nj.dot(nj.array([[bounds.x, bounds.y]]), t1.T);
+            const newPos2 = nj.dot(nj.array([[bounds.x + bounds.width, bounds.y + bounds.height]]), t2.T);
+            this.selection[0]._pos.x = newPos1.get(0, 0);
+            this.selection[0]._pos.y = newPos1.get(0, 1);
+            this.selection[0].width = newPos2.get(0, 0);
+            this.selection[0].height = newPos2.get(0, 1);
+
+            // console.log('T1 => ', t1);
+            // console.log('P1 => ', newPos1);
+            // console.log('P2 => ', newPos2);
+        }
+
         this.render();
     }
 

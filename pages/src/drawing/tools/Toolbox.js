@@ -1,5 +1,6 @@
 import { isPointInRect, checkCorner, cursors } from '../../core/DrawingUtils';
 import nj from 'numjs';
+import Victor from 'victor';
 
 /**
  * 
@@ -15,6 +16,24 @@ import nj from 'numjs';
         y: y - bbox.top  * (canvas.height / bbox.height)
     };
 };
+
+/**
+ * 
+ * @param {*} origin 
+ * @param {*} target 
+ * @returns 
+ */
+function computeTransformation(origin, target) {
+    // Computing the rotation
+    let u = new Victor(origin.x, origin.y);
+    let v = new Victor(target.x, target.y);
+
+    // Computing the scale matrix
+    let translate = nj.array([[1, 0], [0, 1], [target.x - origin.x, target.y - origin.y]]);
+    let scale = nj.array([[target.x / origin.x, 0], [0, target.y / origin.y]]);
+
+    return nj.dot(translate, scale);
+}
 
 /**
  * Tool - Class
@@ -84,6 +103,9 @@ function SelectionTool(editor, canvas) {
         const bounds = editor.selectionDrawable.computeBounds();
         let deltaX = editor.selectionDrawable._pos.x - pos.x;
         let deltaY = editor.selectionDrawable._pos.y - pos.y;
+        let deltaX2;
+        let deltaY2;
+
         const drawableCopy = JSON.parse(JSON.stringify(editor.selectionDrawable)); // Make a copy of the drawable in case we need it later for computation
 
         // Translatiion parameters
@@ -143,11 +165,10 @@ function SelectionTool(editor, canvas) {
                 break;  
         }
 
-        let scale = [[pos.y / drawableCopy._pos.y, 0], [0, pos.x / drawableCopy._pos.x]]
+        const t1 = computeTransformation(new Victor(drawableCopy._pos.x, drawableCopy._pos.y), new Victor(editor.selectionDrawable._pos.x, editor.selectionDrawable._pos.y));
+        const t2 = computeTransformation(new Victor(drawableCopy._pos.x + drawableCopy.width, drawableCopy._pos.y + drawableCopy.height), new Victor(editor.selectionDrawable.width, editor.selectionDrawable.height));
 
-        console.log(pos.x / drawableCopy._pos.x)
-
-        editor.resizeSelection(deltaX, deltaY);
+        editor.resizeSelection(t1, t2);
     });
 
     this.disable = () => {

@@ -1,5 +1,8 @@
 import Victor from 'Victor';
 
+/**
+ * Bound
+ */
 class Bound {
     constructor() {
         this.x = 0;
@@ -12,7 +15,7 @@ class Bound {
 }
 
 /**
- * 
+ * Shape
  */
 class Shape {
     constructor(options) {
@@ -43,7 +46,7 @@ class Shape {
 }
 
 /**
- * 
+ * Rect
  */
 class Rect extends Shape {
     constructor(options) {
@@ -77,19 +80,14 @@ class Rect extends Shape {
     }
 }
 
+/**
+ * Image
+ */
 class Image extends Shape {
     constructor(options) {        
         super(options);
         this.uri = options?.source?.uri || '';
-    }
-
-    /**
-     * 
-     * @returns 
-     */
-    computeBounds() {
-        this.bounds = {x: this._pos.x, y: this._pos.y, width: this.image.width, height: this.image.height};
-        return this.bounds;
+        this.computeBounds();
     }
 
     /**
@@ -108,6 +106,9 @@ class Image extends Shape {
 
             this.image.src = this.uri;
             this.image.onload = (e) => {
+                self.width = self.image.width;
+                self.height = self.image.height;
+                self.computeBounds();
                 // Calling the draw function of the component
                 this.drawImage(context);
             };
@@ -124,7 +125,7 @@ class Image extends Shape {
         if(!context) return;
 
         context.save();
-        context.drawImage(this.image, this._pos.x, this._pos.y);
+        context.drawImage(this.image, this._pos.x, this._pos.y, this.width, this.height);
         context.restore();
     }
 }

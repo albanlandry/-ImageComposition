@@ -1,13 +1,81 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import Template from '../src/Template';
 import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
 import { v4 as uuidv4 } from 'uuid';
 import { windowToCanvas } from '../src/drawing/CanvasUtils';
+import { isPointInRect } from '../src/core/DrawingUtils';
 
 const Configs = {
 
 };
+
+/**
+ * 
+ * @param {*} file 
+ * @returns 
+ */
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.addEventListener('load', () => {
+            resolve(reader.result);
+        }, false);
+
+        reader.addEventListener('error', (err) => {
+            reject(err);
+        }, false);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            reject(new Error('NO FILE FOUND'));
+        }
+    })
+}
+
+/**
+ * 
+ * @param {*} url 
+ * @returns 
+ */
+function readImage(url) {
+    return new Promise((resolve, reject) => {
+        const image = new window.Image();
+        image.onload = (e) => {
+            resolve(image);
+        }
+
+        image.onerror = (e) => {
+            reject(err)
+        }
+
+        image.src = url;
+    })
+}
+
+/**
+ * 
+ * @param {*} ev 
+ * @param {*} reg 
+ * @returns 
+ */
+function getDatatransferFiles(ev, kind = 'file', reg) {
+    let files = [];
+
+    if(ev.dataTransfer.items) {
+        files = [...ev.dataTransfer.items].filter((item) => item.kind === kind)
+        .map((item) => item.getAsFile())
+    } else {
+        files = ev.dataTransfer.files;
+    }
+
+    const image_reg = reg || /^image\/(jpg|jpeg|png)$/i;
+    // We make sure that the files received are images by checking the mime type of the file
+    
+    return files.filter((file) => file.type.trim().match(image_reg));
+}
 
 /**
  * 
@@ -71,37 +139,12 @@ const DefaultHomeArea = React.memo(() => {
     )
 });
 
-const image_url = "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4=";
-
-const generate_rects = (count) => {    
-    return Array(count).fill(0).map((_, i) => {
-        const x = Math.random() * 400;
-        const y = Math.random() * 600;
-        const hh = Math.random() * 400;
-        const ww = Math.random() * 600;
-        const h = Math.random() * 359;
-        const s = Math.random() * 100;
-        const l = Math.random() * 100;
-        const a = (Math.random() + 1) / 2;
-
-        return <Rect
-            key = {i}
-            x ={x} 
-            y = {y}
-            width = {ww}
-            height = {hh}
-            fillStyle = {`hsla(${h}, ${s}%, ${l}%, ${a})`}
-            />
-    });
-}
-
 /**
  * 
  * @param {*} props 
  * @returns 
  */
 const Viewport = (props) => {
-    const shapes = generate_rects(20);
     const [pos, setPos] = useState({x: 0, y: 0});
     const [children, setChildren] = useState([]);
     const [dimens, setDimens] = useState([700, 525]);
@@ -111,39 +154,54 @@ const Viewport = (props) => {
      * 
      * @param {*} e 
      */
-    function onMouseMoveHandler(e) {
-        // console.log('onMouseMoveHandler', e)
-
-        setPos({x: e.x, y: e.y})
-    }
-
-    /**
-     * 
-     * @param {*} e 
-     */
-    const onDrop= (e) =>{
+    const onDrop= async (e) =>{
+        e.preventDefault();
         // e.dataTransfer.setData("text/uri-list", items[index].thumbnail);
         // e.dataTransfer.setData("text/plain", items[index].thumbnail);
         let url = e.dataTransfer.getData("text/uri-list");
 
         if(!url) url = e.dataTransfer.getData("text/plain");
 
+        // If there is no url found inside the data transfer, the drop element most like comes from the user operating storage.
+        // In this case, we open the dropped files and add them to both the viewport and the side list.
+        if(!url) {
+            if(props.onUserFileDropped) props.onUserFileDropped(e);
+
+            const files = getDatatransferFiles(e);
+            await Promise.all(files.map(async (file) => {
+                const res = await readFile(file);
+                await addImageToViewport(e, res);
+                
+                return {label: file.name, thumbnail: res}
+            }))
+
+            setChildren([...children]);
+
+            return;
+        }
+
+        e.dataTransfer.setData("text/uri-list", null);
+        e.dataTransfer.setData("text/plain", null);
+        
+        await addImageToViewport(e, url);
+
+        setChildren([...children]);
+    };
+
+    const addImageToViewport = async (e, url) => {
+        const image = await readImage(url);
+        const mouse = windowToCanvas(canvasRef.current, e.clientX, e.clientY);
+        const pos = {x: mouse.x - image.width/2, y: mouse.y - image.height/2};
         children.push(                    
             <Image
                 zIndex={children.length + 1}
                 key={children.length}
-                x = {0}
-                y = {0}
+                x = {pos.x}
+                y = {pos.y}
                 source = {{uri: url}}
                 uuid={uuidv4()}
             />)
-
-        e.dataTransfer.setData("text/uri-list", null);
-        e.dataTransfer.setData("text/plain", null);
-
-        setChildren([...children]);
-        console.log('onDrop...', url)
-    };
+    }
 
     /**
      * 
@@ -161,34 +219,7 @@ const Viewport = (props) => {
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
             <div onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
                 <Canvas width={dimens[0]} height={dimens[1]} pointer={pos} onCanvasReady={onCanvasReady}>
-                    {
-                        children
-                    /*
-                    <Image 
-                            x = {300}
-                            y = {100}
-                            source = {{uri: image_url}}
-                        />
-                    <Rect 
-                        x = {200}
-                        y = {200}
-                        width={100}
-                        height={100}
-                        fillStyle = {"#4389aa"}               
-                    />
-                    <Rect 
-                        x = {pos.x}
-                        y = {pos.x}
-                        width={200}
-                        height={100}               
-                    />
-                    <Image 
-                        x = {50}
-                        y = {50}
-                        source = {{uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"}}
-                    />
-                    */
-                    }
+                    {children}
                 </Canvas>
             </div>
         </div>
@@ -202,24 +233,25 @@ const Viewport = (props) => {
  */
 const MainArea = function (props) {
 
+    const handleOnUserFileDropped = (e) => {
+        if(props.onViewportFileDropped) props.onViewportFileDropped(e);
+    }
+
     return(
         <div className="w-5/6 h-full bg-[#dfe6e9]">
             { /* <DefaultHomeArea /> */ }
-            <Viewport />
+            <Viewport onUserFileDropped={handleOnUserFileDropped} />
         </div>
     )
 };
 
+/**
+ * 
+ * @param {*} props 
+ * @returns 
+ */
 const SideMenu = (props) => {
-    const items = [
-        {label: "images 1", thumbnail: "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4="},
-        {label: "images 2", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.asicentral.com%2Fmedia%2F20479%2Fscottcolumnfig4-800.jpg&f=1&nofb=1&ipt=fcab215c4898ef49595cc7b3c7174a30ac6c08462f75282194a637b9bb916518&ipo=images"},
-        {label: "images 3", thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.aZ3vzsdzZcLc0brFCniaRgHaE8%26pid%3DApi&f=1&ipt=522e4e4751f59c87589e6fdf991c3b52bb642da9a8dc1d89286e00c07078d054&ipo=images"},
-        {label: "images 5", thumbnail: "https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/6007/dog-clipart-md.png"},
-        {label: "Falling snow", thumbnail: "https://pngimg.com/uploads/snow/snow_PNG27.png"},
-        {label: "Sun Rays", thumbnail: "https://www.clipartmax.com/png/full/79-795646_art-clipart-transparent-background-sun-rays-clipart.png"},
-    ]
-
+    const items = props.items;
 
     /**
      * 
@@ -247,8 +279,11 @@ const SideMenu = (props) => {
      * @param {*} e 
      */
     const onDragEnd = (e) => {
-        console.log('onDragEnd...');
+        console.log('onDragEnd...', e);
         // e.target.classList.remove("opacity-60");
+        e.target.classList.remove("opacity-60");
+        e.target.classList.remove("border-b-4");
+        e.target.classList.remove("border-blue-400");
     };
 
     /**
@@ -258,10 +293,17 @@ const SideMenu = (props) => {
     const onDragOver = (e) => {
         e.preventDefault();
 
-        console.log(e.target);
+        if(e.target.localName === "ul") return;
+
+        // Child element
         e.target.classList.add("opacity-40");
         e.target.classList.add("border-b-4");
         e.target.classList.add("border-blue-400");
+
+        // Parent element
+        e.target.parentNode.classList.add("border-2");
+        e.target.parentNode.classList.add("border-dashed");
+        e.target.parentNode.classList.add("border-cyan-400");
         // e.target.classList.add("bg-sky-200");
     }
 
@@ -270,10 +312,24 @@ const SideMenu = (props) => {
      * @param {*} e 
      */
     const onDragLeave = (e) => {
+        e.preventDefault();
+
         e.target.classList.remove("opacity-40");
         e.target.classList.remove("border-b-4");
         e.target.classList.remove("border-blue-400");
-        e.preventDefault();
+
+        if(isPointInRect(e.target.parentNode.getBoundingClientRect(), {x: e.clientX, y: e.clientY})) return;
+
+        //Parent element
+        e.target.parentNode.classList.remove("border-2");
+        e.target.parentNode.classList.remove("border-dashed");
+        e.target.parentNode.classList.remove("border-cyan-400");
+
+        if(e.target.localName === "ul") {
+            e.target.classList.remove("border-2");
+            e.target.classList.remove("border-dashed");
+            e.target.classList.remove("border-cyan-400");
+        }
     }
 
     /**
@@ -285,9 +341,28 @@ const SideMenu = (props) => {
         e.target.classList.remove("opacity-40");
         e.target.classList.remove("border-b-4");
         e.target.classList.remove("border-blue-400");
-        console.log('onDrop', e.target);
+
+        //Parent element
+        e.target.parentNode.classList.remove("border-2");
+        e.target.parentNode.classList.remove("border-dashed");
+        e.target.parentNode.classList.remove("border-cyan-400");
+
+        if(e.target.localName === "ul") {
+            e.target.classList.remove("border-2");
+            e.target.classList.remove("border-dashed");
+            e.target.classList.remove("border-cyan-400");
+        }
+
+        if(props.onFileDropped) props.onFileDropped(e);
+        // handleDroppedFile(e);
     }
 
+    /**
+     * 
+     * @param {*} e 
+     */
+
+    // Mapping children items
     const children = items.map((item, index) => {
         return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]"
             draggable={true}
@@ -300,8 +375,14 @@ const SideMenu = (props) => {
     })
 
     return (
-        <ul onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} className="max-h-full overflow-y-auto">
-            {children}
+        <ul onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} className="max-h-full h-[500px] overflow-y-auto">
+            <>
+            {(children.length <= 0) ?
+                <li className="h-full w-full border-2 border-dashed border-cyan-400 flex justify-center items-center">
+                    <span className="flex box-border p-2 text-center text-cyan-600 pointer-events-none">Drop your image(s) here or inside the canvas</span>
+                </li>
+            : children}
+            </>
         </ul>
     )
 };
@@ -320,8 +401,8 @@ const Thumbnail = React.memo((props) => {
 
     return (
         <div className = "p-2 box-border pointer-events-none select-none flex items-center">
-            <div className={`flex flex-1 items-center border w-[${width}px] h-[${height}px]`}>
-                <img src = {props.src}/>
+            <div className={`items-center flex justify-center border w-[80px] h-[80px]`}>
+                <img src = {props.src} className="h-full w-full object-contain"/>
             </div>
             <span className="flex-2 px-2 text-sm">{props.label || ""}</span>
         </div>
@@ -334,7 +415,36 @@ const Thumbnail = React.memo((props) => {
  * @returns 
  */
 export default function Editor (props) {
+    // Data
+    const [items, setItems] = useState([]);
+
+    // Events handlers
+    const handleDroppedFile = async (ev) => {
+        const files = getDatatransferFiles(ev);
+
+        if(files.length > 0 && props.onFileAdded)
+            props.onFileAdded(files)
+
+        const result = await Promise.all(files.map(async (file) => {
+            const res = await readFile(file);
+            
+            return {label: file.name, thumbnail: res}
+        }))
+
+        setItems(items.concat(result));
+    }
+
+    // UI elements
+    const sideMenus = [<SideMenu items={items} key={0} onFileDropped={handleDroppedFile.bind(this)}/>];
+
+    const onViewportFileDropped = (e) => {
+        e.preventDefault();
+
+        handleDroppedFile(e);
+        // console.log(`onViewport file dropped`, e);
+    }
+
    return(
-    <Template mainArea={<MainArea />} sideMenus={[<SideMenu key={0}/>]} />
+    <Template mainArea={<MainArea onViewportFileDropped={onViewportFileDropped} />} sideMenus={sideMenus} />
    )
 }

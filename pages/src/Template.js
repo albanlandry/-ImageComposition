@@ -3,9 +3,8 @@ import React from 'react';
 const Header = (props) => {
     return (
         <div className="w-full">
-            <h1 className="text-2xl font-bold text-right p-2">
-            Header Menu
-            </h1>
+            {props.header || <h1 className="text-2xl font-bold text-right p-2">Header Menu</h1>
+            }
         </div>
     )
 };

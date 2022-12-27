@@ -21,13 +21,8 @@ import nj from 'numjs';
 };
 
 /**
- * Moves the points accoring to the position of the mouse pointer on the element
- * @param {*} mouseX 
- * @param {*} mouseY 
- * @param {Shape} drawable
- * @returns 
+ * 
  */
-
 class SceneEditor {
     constructor(options) {
         this.scene = new Scene(),

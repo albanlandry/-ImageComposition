@@ -65,37 +65,36 @@ function SelectionTool(editor, canvas) {
     this.isDragging;
     this.canvas = canvas;
     this.hit = -1;
+    this.listeners = {};
 
-    const mouseDownUUID = editor.mouse.mouseDown.add(({x, y}) => {
+    /**
+     * 
+     * @param {*} param0 
+     */
+    const mouseDown = ({x, y}) => {
         self.pos.x = x;
         self.pos.y = y;
         editor.select(x, y);
-    });
+    };
 
-    const mouseUpUUID = editor.mouse.mouseUp.add(({x, y}) => {
-        // console.log('mouseUp', x, y)
-    });
-
-    const mouseMoveUUID = editor.mouse.mouseMove.add(({x, y}) => {
+    /**
+     * 
+     * @param {*} param0 
+     */
+    const mouseMove = ({x, y}) => {
         const pos = editor.pointToCanvas(x,  y);
 
         if(editor.selectionDrawable && !editor.mouse.isDragging) {
             this.hit = checkCorner(pos, 20, editor.selectionDrawable.computeBounds());
             editor.setCursor(cursors(this.hit));
         }
-    })
+    };
 
-    /*
-    let transform = nj.array([[1, 0], [0, 1], [5, 4]]);
-    const scale = nj.array([[2, 0], [0, 2]])
+    const mouseUp = ({x, y}) => {
+        // console.log('mouseUp', x, y)
+    };
 
-    transform = transform.dot(scale);
-
-    const vector = nj.array([[2, 2, 1]]);
-    console.log("NP", nj.dot(vector, transform));
-    */
-
-    const mouseDraggingUUID = editor.mouse.dragging.add(({x, y}) => {
+    const mouseDraggring = ({x, y}) => {
         // console.log('mouseDragging', x, y, self.pos.x, self.pos.y);
         if(!editor.selectionDrawable) return;
 
@@ -169,14 +168,25 @@ function SelectionTool(editor, canvas) {
         const t2 = computeTransformation(new Victor(drawableCopy._pos.x + drawableCopy.width, drawableCopy._pos.y + drawableCopy.height), new Victor(editor.selectionDrawable.width, editor.selectionDrawable.height));
 
         editor.resizeSelection(t1, t2);
-    });
+    };
 
     this.disable = () => {
-        editor.mouse.mouseDown.remove(mouseDownUUID);
-        editor.mouse.mouseUp.remove(mouseUpUUID);
-        editor.mouse.mouseMove.remove(mouseMoveUUID);
-        editor.mouse.dragging.remove(mouseDraggingUUID);
+        editor.mouse.mouseDown.remove(this.listeners.mouseDownUUID);
+        editor.mouse.mouseUp.remove(this.listeners.mouseUpUUID);
+        editor.mouse.mouseMove.remove(this.listeners.mouseMoveUUID);
+        editor.mouse.dragging.remove(this.listeners.mouseDraggingUUID);
     }
+
+    this.enable = () => {
+        this.listeners.mouseDownUUID = editor.mouse.mouseDown.add(mouseDown);
+        this.listeners. mouseUpUUID = editor.mouse.mouseUp.add(mouseUp);
+        this.listeners.mouseMoveUUID = editor.mouse.mouseMove.add(mouseMove)
+        this.listeners.mouseDraggingUUID = editor.mouse.dragging.add(mouseDraggring);
+    }
+    
+
+    // Enable all the listeners
+    this.enable();
 }
 
 SelectionTool.prototype = Object.create(Tool.prototype);

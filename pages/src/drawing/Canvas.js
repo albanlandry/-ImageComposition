@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import PropTypes from 'prop-types';
 import ShapeCreator from './shapes/ShapeCreator';
-import { MouseDragger } from "../core/event/Managers";
+import { MouseDragger, KeyboardManager } from "../core/event/Managers";
 import Editor from './Editor';
 import * as Toolbox from './tools/Toolbox';
 
@@ -21,7 +21,9 @@ const Canvas = (props) => {
 
     useEffect(() => {
         const cvs = canvasRef.current;
-        Editor.mouse = new MouseDragger();
+        if (! Editor.mouse) Editor.mouse = new MouseDragger();
+        if (! Editor.keyboard) Editor.keyboard = new KeyboardManager();
+        
         Editor.setTool(new Toolbox.SelectionTool(Editor));
         Editor.canvas = cvs; // Setting the canvas for the editor
 
@@ -69,7 +71,7 @@ const Canvas = (props) => {
 
     return (
         <canvas
-            className = "border border-solid border-black box-border shadow-[0px_0px_4px_rgba(0,0,0,1)]"
+            className = "border border-solid border-[rgba(0,0,0,0.4)] box-border shadow-[2px_2px_4px_rgba(0,0,0,1)]"
             ref={canvasRef} width={canvasWidth} height={canvasHeight}>
         </canvas>
     )

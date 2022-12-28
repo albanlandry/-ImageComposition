@@ -110,7 +110,6 @@ const Draggable = (props) => {
 
             if(isDragging.current && props.onMouseMoveHandler) {
                 props.onMouseMoveHandler(windowToCanvas(cvs, e.clientX, e.clientY));
-                // console.log('onMouseMoveHandler', windowToCanvas(cvs, e.clientX, e.clientY));
             }
         }
         // Add the context property to each child component.

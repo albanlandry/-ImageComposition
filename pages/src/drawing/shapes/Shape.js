@@ -69,7 +69,6 @@ class Rect extends Shape {
 
         context.save();
 
-        // console.log("drawing", this._pos)
         context.beginPath();
         context.fillStyle = this.fillStyle;
         context.rect(this._pos.x, this._pos.y, this.bounds.width, this.bounds.height);

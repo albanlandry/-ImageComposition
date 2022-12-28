@@ -30,6 +30,7 @@ class SceneEditor {
         this.selectionDrawable = null,
         this.selectionDrawableUUID = null,
         this.mouse = null,
+        this.keyboard = null,
         this.init = false,
         this.tool = null,
         this.canvas = null;
@@ -101,7 +102,7 @@ class SceneEditor {
                     ty = sel.pos.y - this.selectionDrawable.pos.y; // The y position in the coordinates with respect to the selection drawable as the origin, 
 
                     if(this.shouldSnap) {
-                        console.log(newX, newY, this.snapToGrid(newX, newY, this.grid.x, this.grid.y));
+                        // console.log(newX, newY, this.snapToGrid(newX, newY, this.grid.x, this.grid.y));
                         const snap = this.snapToGrid(newX, newY, this.grid.x, this.grid.y);
                         newX = snap.x;
                         newY = snap.y;
@@ -123,6 +124,15 @@ class SceneEditor {
         this.free = () => {
             Editor.mouse.removeListeners();
         };
+    }
+
+    deleteSelection() {
+        if(this.selection && this.selection.length > 0) {
+            this.scene.removeChild(...this.selection);
+            console.log('Delete selection', this.selection)
+        }
+        
+        this.render();
     }
 
     /**
@@ -205,7 +215,6 @@ class SceneEditor {
      * @param {*} newDim 
      */
     resizeSelection(t1, t2) {
-        // console.log(`Delta (x: ${dx}, y: ${dy})`);
         if(this.selection && this.selection.length > 0) {
             const bounds = this.selection[0].computeBounds();
             const newPos1 = nj.dot(nj.array([[bounds.x, bounds.y]]), t1.T);
@@ -214,10 +223,6 @@ class SceneEditor {
             this.selection[0]._pos.y = newPos1.get(0, 1);
             this.selection[0].width = newPos2.get(0, 0);
             this.selection[0].height = newPos2.get(0, 1);
-
-            // console.log('T1 => ', t1);
-            // console.log('P1 => ', newPos1);
-            // console.log('P2 => ', newPos2);
         }
 
         this.render();

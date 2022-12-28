@@ -1,6 +1,35 @@
 import EventEmitter from "./EventEmitter";
 
 /**
+ * /finid the name of the current os
+ * @returns 
+ */
+function os ()
+{
+    let os = navigator.userAgent;
+    let finalOs="";
+    if (os.search('Windows')!==-1){
+        finalOs="Windows";
+    }
+    else if (os.search('Mac')!==-1){
+        finalOs="MacOS";
+    }
+    else if (os.search('X11')!==-1 && !(os.search('Linux')!==-1)){
+        finalOs="UNIX";
+    }
+    else if (os.search('Linux')!==-1 && os.search('X11')!==-1){
+        finalOs="Linux"
+    }
+    
+    return finalOs;
+}
+
+
+const Utils = {
+    os: os,
+}
+
+/**
  * Handle events related to the mouse + other events from the canvas
  */
 function MouseDragger() {
@@ -70,8 +99,15 @@ function KeyboardManager(options) {
     this.keyDown = new EventEmitter();
     this.keyUp = new EventEmitter();
 
-    function onKeyDown(e) {
+    window.addEventListener('keydown', onKeyDown, false);
+    window.addEventListener('keyup', onKeyUp, false);
 
+    /**
+     * Handler for Key down 
+     * @param {*} e 
+     */
+    function onKeyDown(e) {
+        self.keyDown.emit(e);
     }
 
     /**
@@ -79,7 +115,22 @@ function KeyboardManager(options) {
      * @param {*} e 
      */
     function onKeyUp(e) {
+        self.keyUp.emit(e);
+    }
 
+    /**
+     * 
+     */
+    this.removeListeners = () => {
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+    }
+
+    this.isDeleteKey = (e) => {
+        const macDelete = Utils.os().toLocaleLowerCase().includes('mac') && (e.metaKey && (e.code.toLowerCase() === 'backspace' || e.keyCode === 8));
+
+
+        return macDelete;
     }
 }
 

@@ -252,13 +252,17 @@ const MainArea = function (props) {
  */
 const SideMenu = (props) => {
     const items = props.items;
+    const [selected, setSelection] = useState(null);
 
     /**
      * 
      * @param {*} e 
      */
     const onDragStart = (index, e) => {
-        console.log('onDragStart...');
+        // Select the element at the given index.
+        setSelection(index);
+
+        // Editing the style of the selected element.
         e.target.classList.add("opacity-60");
 
         // Data transfer
@@ -359,31 +363,42 @@ const SideMenu = (props) => {
 
     /**
      * 
+     * @param {*} index 
      * @param {*} e 
      */
+    const onItemClick = (index, e) => {
+        console.log(`index: ${index}, event: ${e}`);
+        setSelection(index);
+    }
 
     // Mapping children items
+    // className="p-1 box-border last:border-0 odd:border-b-[#dfe6e9] h-fit hover:bg-[#b2bec3]/[0.9]"
     const children = items.map((item, index) => {
-        return <li key={index} className="p-1 box-border border-b last:border-0 odd:border-b-[#dfe6e9] hover:bg-[#b2bec3]/[0.9]"
+        return <li key={index} className={`p-1 box-border h-fit hover:bg-[#b2bec3]/[0.9] inline-block m-auto ${index === selected? 'bg-[#b2bec3]/[0.9]' : ''}`}
             draggable={true}
             onDrag={onDrag}
             onDragStart={onDragStart.bind(this, index)}
             onDragEnd={onDragEnd}
+            onClick={onItemClick.bind(this, index)}
             >
             <Thumbnail src={item.thumbnail} label={item.label} />
         </li>
     })
 
     return (
-        <ul onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} className="max-h-full h-[500px] overflow-y-auto">
-            <>
-            {(children.length <= 0) ?
-                <li className="h-full w-full border-2 border-dashed border-cyan-400 flex justify-center items-center">
-                    <span className="flex box-border p-2 text-center text-cyan-600 pointer-events-none">Drop your image(s) here or inside the canvas</span>
-                </li>
-            : children}
-            </>
-        </ul>
+        <div className="max-h-full w-full overflow-y-auto flex-col">
+            <div className="flex justify-center max-h-[500px]">
+                <ul onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} className={(children.length > 0) ? "inline-grid grid-cols-2 lg:grid-cols-3 gap-0" : ""}>
+                    <>
+                    {(children.length <= 0) ?
+                        <li className="h-[500px] w-full border-2 border-dashed border-cyan-400 flex justify-center items-center">
+                            <span className="flex box-border p-2 text-center text-cyan-600 pointer-events-none">Drop your image(s) here or inside the canvas</span>
+                        </li>
+                    : children}
+                    </>
+                </ul>
+            </div>
+        </div>
     )
 };
 
@@ -400,11 +415,11 @@ const Thumbnail = React.memo((props) => {
     const height = props.height || THUMB_IMAGE_DEFAULT_SIZE;
 
     return (
-        <div className = "p-2 box-border pointer-events-none select-none flex items-center">
-            <div className={`items-center flex justify-center border w-[80px] h-[80px]`}>
+        <div className = "p-1 box-border pointer-events-none select-none flex items-center">
+            <div className={`items-center flex justify-center border w-[50px] h-[50px]`}>
                 <img src = {props.src} className="h-full w-full object-contain"/>
             </div>
-            <span className="flex-2 px-2 text-sm">{props.label || ""}</span>
+            {/*<span className="flex-2 px-2 text-sm">{props.label || ""}</span>*/}
         </div>
     )
 });
@@ -441,7 +456,6 @@ export default function Editor (props) {
         e.preventDefault();
 
         handleDroppedFile(e);
-        // console.log(`onViewport file dropped`, e);
     }
 
    return(

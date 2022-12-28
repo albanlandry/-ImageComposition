@@ -69,6 +69,18 @@ function SelectionTool(editor, canvas) {
 
     /**
      * 
+     * @param {*} e 
+     */
+    const keyDown = (e) => {
+        if(editor.keyboard.isDeleteKey(e)) {
+            editor.deleteSelection();
+
+            return;
+        }
+    }
+
+    /**
+     * 
      * @param {*} param0 
      */
     const mouseDown = ({x, y}) => {
@@ -85,7 +97,7 @@ function SelectionTool(editor, canvas) {
         const pos = editor.pointToCanvas(x,  y);
 
         if(editor.selectionDrawable && !editor.mouse.isDragging) {
-            this.hit = checkCorner(pos, 20, editor.selectionDrawable.computeBounds());
+            this.hit = checkCorner(pos, editor.selectionDrawable.handleRadius * 2, editor.selectionDrawable.computeBounds());
             editor.setCursor(cursors(this.hit));
         }
     };
@@ -175,6 +187,7 @@ function SelectionTool(editor, canvas) {
         editor.mouse.mouseUp.remove(this.listeners.mouseUpUUID);
         editor.mouse.mouseMove.remove(this.listeners.mouseMoveUUID);
         editor.mouse.dragging.remove(this.listeners.mouseDraggingUUID);
+        editor.keyboard.keyDown.remove(this.listeners.keyDownUUID);
     }
 
     this.enable = () => {
@@ -182,8 +195,8 @@ function SelectionTool(editor, canvas) {
         this.listeners. mouseUpUUID = editor.mouse.mouseUp.add(mouseUp);
         this.listeners.mouseMoveUUID = editor.mouse.mouseMove.add(mouseMove)
         this.listeners.mouseDraggingUUID = editor.mouse.dragging.add(mouseDraggring);
+        this.listeners.keyDownUUID = editor.keyboard.keyDown.add(keyDown);
     }
-    
 
     // Enable all the listeners
     this.enable();

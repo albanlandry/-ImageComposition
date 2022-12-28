@@ -6,10 +6,17 @@ import Victor from 'victor';
  * @param {Point} pt
  * @return {boolean} true if the point is inside the given rect
  */
+/*
  function isPointInRect(rect, pt) {
     return (pt.x > rect.x) && (pt.x < (Math.abs(rect.x) + Math.abs(rect.width)))
        && (pt.y > rect.y) && (pt.y < (Math.abs(rect.y) + Math.abs(rect.height)));
  }
+ */
+
+function isPointInRect(rect, pt) {
+   return (pt.x > rect.x) && (pt.x < (rect.x + rect.width))
+      && (pt.y > rect.y) && (pt.y < (rect.y + rect.height));
+}
 
  /**
   * 

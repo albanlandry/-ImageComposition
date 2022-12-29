@@ -2,6 +2,7 @@
 import * as Utils from "./DrawingUtils.js";
 import { v4 as uuidv4 } from 'uuid';
 import { calculateAspectRatioFit } from './DrawingUtils.js';
+import { SceneSnapshot } from "./store/Snapshot.js";
 
 function Shape() {
     this.isTemplate = false;
@@ -9,9 +10,14 @@ function Shape() {
     this.name = "";
 }
 
+Shape.prototype.snapshot = function() {
+    throw Error ('Cannot snapshot. Must implement the snapshot function.');
+};
+
 /**
-* Implement a rectangle boundary
-* */
+ * Implement a rectangle boundary
+ * @param {*} newOptions 
+ */
 function Rect(newOptions) {
     Shape.call(this);
 
@@ -56,6 +62,7 @@ Rect.prototype.draw = function (ctx) {
 
 /**
  * 
+ * @param {*} options 
  */
 function RectCrop(options) {
     Rect.call(this, options);
@@ -139,8 +146,11 @@ RectCrop.prototype.draw = function (ctx) {
 };
 
 /**
-* Points
-*/
+ * 
+ * @param {*} px 
+ * @param {*} py 
+ * @param {*} color 
+ */
 function Point(px, py, color) {
     Shape.call(this);
 
@@ -226,9 +236,9 @@ ImageShape.prototype.draw = function (ctx) {
 };
 
 /**
-* Chain
-* Just a simple list of points
-* */
+ * Chain - Just a simple list of points
+ * @param {*} points 
+ */
 function Chain(points) {
     this.points = [];
 
@@ -353,6 +363,10 @@ Scene.prototype = {
 
     reset: function () {
         this.children = [];
+    },
+
+    snapshot: function () {
+        return new SceneSnapshot(this);
     }
 };
 

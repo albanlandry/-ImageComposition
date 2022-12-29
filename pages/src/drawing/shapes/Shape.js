@@ -1,4 +1,5 @@
 import Victor from 'Victor';
+import { DocumentSnapshot, ImageSnapshot, ShapeSnapshot } from '../../core/store/Snapshot';
 
 /**
  * Bound
@@ -31,8 +32,6 @@ class Shape {
 
     set pos(value) { this._pos = value; }
 
-    // get bounds() { return this.bounds; }
-
     computeBounds() {
         this.bounds = {x: this._pos.x, y: this._pos.y, width: this.width, height: this.height};
         this.bounds.min = {x: this._pos.x, y: this._pos.y};
@@ -40,8 +39,20 @@ class Shape {
         return this.bounds;
     }
 
+    /**
+     * 
+     * @param {*} context 
+     */
     draw(context) {
         throw new Error('computeBounds must be implemented by the child.');
+    }
+
+    snapshot(canvas) {
+        this.computeBounds();
+
+        const snapshot = new ShapeSnapshot(this);
+
+        return snapshot;
     }
 }
 
@@ -80,6 +91,7 @@ class Rect extends Shape {
 }
 
 /**
+ * 
  * Image
  */
 class Image extends Shape {

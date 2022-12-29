@@ -4,6 +4,7 @@ import Scene from '../core/Drawing';
 import { isPointInRect } from "../core/DrawingUtils";
 import Victor from 'victor';
 import nj from 'numjs';
+import { DocumentSnapshot } from '../core/store/Snapshot';
 
 /**
  * 
@@ -21,7 +22,7 @@ import nj from 'numjs';
 };
 
 /**
- * 
+ * SceneEditor
  */
 class SceneEditor {
     constructor(options) {
@@ -70,6 +71,8 @@ class SceneEditor {
                 this.selectionDrawable = ShapeCreator.getShape({ name: 'selection', x: minX, y: minY, width: width, height: height });
                 // this.selectionDrawableUUID = this.scene.add(this.selectionDrawable);
                 this.selection = selected;
+
+                this.snapshot();
 
                 // Compute the distance between the rectangle's top-left
                 // corner and the cursor position.
@@ -130,6 +133,7 @@ class SceneEditor {
         if(this.selection && this.selection.length > 0) {
             this.scene.removeChild(...this.selection);
             console.log('Delete selection', this.selection)
+            console.log('Update selection drawable');
         }
         
         this.render();
@@ -226,6 +230,16 @@ class SceneEditor {
         }
 
         this.render();
+    }
+
+    /**
+     * 
+     */
+    snapshot() {
+        this.snap = new DocumentSnapshot(this);
+        // this.snap.sceneSnapshot(this.scene);
+
+        console.log(this.snap.toString());
     }
 
     /**

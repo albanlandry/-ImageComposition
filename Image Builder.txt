@@ -1,0 +1,96 @@
+[Objectives]
+The application is to help the user to create the foreground image related to the seek mission of the poppop application. 
+
+[User stories]
+	⁃	The user can create a new illustration document in order to compose the foreground image
+	⁃	The user can open one or many images from his data storage (hard drive)
+	⁃	The user can drag an image from the list of image and drop it to the main canvas of the application
+	⁃	The user can select an image from the canvas, move, scale or rotate it within the canvas boundaries
+	⁃	The user can save the content of the canvas to be reused for a ulterior session
+	⁃	The user can upload the final image to be used as the foreground image
+	⁃	The user can zoom in/out the main canvas of the application to have a closer view of the the pixels in the canvas
+
+[Creating a new illustration]
+	⁃	Default state:
+	1.	The system displays the default home screen
+	- The system displays a create new illustration bouton 
+	- The system displays a drag and drop box inside the main area of the application
+	- The system display an empty list with a drag and drop box in the side area of the application
+	2.1. The user clicks the new illustration button
+		1.1.1. The system displays the new illustration modal
+			- Label for width
+			- Label for height
+			- Text input for width (in pixels)
+			- Text input for height (in pixels)
+			- Create button
+		1.1.2 The user enters the width and height and click on the button create
+		1.1.3 The systems validates the inputs of the width and height Text inputs
+			- Width and height must be integers greater than 0
+			1.1.3.1 if the input are invalid the system displays an error message to the user.
+		1.1.4 The system displays an empty viewport on the screen with the given width and height
+	2.2 The user drag an image from his storage and drop it on the drag and drop inside the main area
+		2.2.1 The system validates the format of the dropped item and displays a viewport with the size of the dropped image and the image displayed in it.
+			- The item must be an image (jpeg, or png) with size greater than 0
+			2.2.1.1 if the input are invalid the system displays an error message to the user.
+	Final state:
+		2.1:- An empty viewport of the size Width x Height is displayed on the main area
+			- The side list area is initialized with a thumbnail of the viewport background color as item
+		2.2	- The viewport is initialized with the size of the dropped image
+			- The drop image is displayed in the viewport
+			- The side list area is initialized with a thumbnail of the image dropped in the viewport
+
+[Case 2.2] The user drag an image from his storage and drop it on the drag and drop inside the main area
+1. Filter and validate the input files
+	- Get the list of file dropped by the user
+	- Filter out all the files that are not images (jpg, jpeg, png) with a size greater than 0
+	=> The final output is the list of files, each representing a valid image.
+		- Since we use react, the files are to be dispatched through an event handler received from the parent component.
+2. Initialize the viewport with the filtered images
+	With the list of files:
+	- Convert each file to his corresponding image
+	- Find the highest width and the highest height from all the images
+	- Initialize the size of the viewport with the value highest width and highest height
+
+	[Viewport]
+	- The user drop images in the Viewport
+	- The Viewport displays one or more images
+	- The user can select an image -> The Viewport draws the selection boundaries of the selected image
+	- the user can operate the following operations on the selected image:
+		- rotate
+		- move
+		- scales
+		- zoom
+
+	[Bounds]
+		- x
+		- y
+		- width
+		- height
+	[MouseHandler]
+		- Enables the mouse events on the canvas and returns the canvas coordinates
+
+12.05 - 12.09
+Poppop Missions background image builder
+- Conceptual analysis
+- Project configuration
+- Git repository connection
+- Template development [started]
+- Assisting team members fixing bugs in codes
+
+[Save the content of the Canvas]
+	- Default state: the canvas can be empty or populated with images
+	1. The user click on the save button
+	2. The system simultanously saves the scene inside the browser's cache and uploads it to the backend
+	- Final state:
+		- The UI is updated to show the user that the last changes were successfully saved
+		- The scene is save in the browser's localStorage object under the name ''
+		- The databased is updated with the data of the scene
+
+	[saving the scene]
+		- Getting the content of the editor's scene and the canvas
+		- For each drawable element of the scene, 
+			- Computing its absolute position in percentage inside the canvas.
+			- Generate a simpler json representation of the element
+		- Save the whole json representation of the scene in the application storage (localStorage / misson_info table in database)
+
+	

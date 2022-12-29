@@ -128,9 +128,9 @@ function KeyboardManager(options) {
 
     this.isDeleteKey = (e) => {
         const macDelete = Utils.os().toLocaleLowerCase().includes('mac') && (e.metaKey && (e.code.toLowerCase() === 'backspace' || e.keyCode === 8));
+        const winDelete = Utils.os().toLocaleLowerCase().includes('windows') && (e.code.toLowerCase() === 'delete' || e.keyCode === 46)
 
-
-        return macDelete;
+        return macDelete || winDelete;
     }
 }
 

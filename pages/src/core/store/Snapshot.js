@@ -54,7 +54,7 @@ class ImageSnapshot extends ShapeSnapshot {
     constructor(state) {
         super(state);
 
-        this.payload.image = state.imageData;
+        this.payload.src = state.image.src;
     }
 }
 
@@ -90,16 +90,8 @@ class DocumentSnapshot extends Snapshot {
     toString()  {
         const scenesnap = new SceneSnapshot(this.payload.scene)
 
-        return `{dimensions:${JSON.stringify(this.payload.dimensions)},"scene": ${scenesnap.toString()}}`.replaceAll('\r\n', '');
+        return `{"dimensions":${JSON.stringify(this.payload.dimensions)},"scene": ${scenesnap.toString()}}`.replaceAll('\r\n', '');
     }
-    /*
-    sceneSnapshot(scene) {
-        scene.children.forEach(child => {
-            if(!child.snapshot) throw new Error('No snapshot found');
-
-            this.payload.scene.children.push(child.snapshot())
-        });
-    }*/
 }
 
 export {DocumentSnapshot, ImageSnapshot, ShapeSnapshot, SceneSnapshot};

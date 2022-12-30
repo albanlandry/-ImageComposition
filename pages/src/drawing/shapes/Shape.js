@@ -139,6 +139,12 @@ class Image extends Shape {
         context.drawImage(this.image, this._pos.x, this._pos.y, this.width, this.height);
         context.restore();
     }
+
+    snapshot() {
+        const snapshot = new ImageSnapshot(this);
+
+        return snapshot;
+    }
 }
 
 /**

@@ -217,7 +217,7 @@ const Viewport = (props) => {
 
     return(
         <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
-            <div onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
+            <div className="bg-slate-50" onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
                 <Canvas width={dimens[0]} height={dimens[1]} pointer={pos} onCanvasReady={onCanvasReady}>
                     {children}
                 </Canvas>

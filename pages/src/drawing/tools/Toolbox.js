@@ -84,6 +84,8 @@ function SelectionTool(editor, canvas) {
      * @param {*} param0 
      */
     const mouseDown = ({x, y}) => {
+        if(this.hit !== -1) return;
+
         self.pos.x = x;
         self.pos.y = y;
         editor.select(x, y);

@@ -12,6 +12,7 @@
     "canvas": "^2.10.2",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.6",
+    "formik": "^2.2.9",
     "konva": "^8.3.14",
     "next": "13.0.6",
     "numjs": "^0.16.1",

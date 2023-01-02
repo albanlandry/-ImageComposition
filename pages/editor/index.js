@@ -156,8 +156,7 @@ const Viewport = (props) => {
      */
     const onDrop= async (e) =>{
         e.preventDefault();
-        // e.dataTransfer.setData("text/uri-list", items[index].thumbnail);
-        // e.dataTransfer.setData("text/plain", items[index].thumbnail);
+        
         let url = e.dataTransfer.getData("text/uri-list");
 
         if(!url) url = e.dataTransfer.getData("text/plain");

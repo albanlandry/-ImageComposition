@@ -18,6 +18,7 @@
     "numjs": "^0.16.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
     "react-konva": "^18.2.3",
     "uuidv4": "^6.2.13",
     "victor": "^1.1.0"

@@ -5,77 +5,11 @@ import { Rect, Image }from '../src/drawing/drawables/Shapes';
 import { v4 as uuidv4 } from 'uuid';
 import { windowToCanvas } from '../src/drawing/CanvasUtils';
 import { isPointInRect } from '../src/core/DrawingUtils';
+import { getDatatransferFiles, readFile, readImage } from '../src/Utils';
 
 const Configs = {
 
 };
-
-/**
- * 
- * @param {*} file 
- * @returns 
- */
-function readFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.addEventListener('load', () => {
-            resolve(reader.result);
-        }, false);
-
-        reader.addEventListener('error', (err) => {
-            reject(err);
-        }, false);
-
-        if (file) {
-            reader.readAsDataURL(file);
-        } else {
-            reject(new Error('NO FILE FOUND'));
-        }
-    })
-}
-
-/**
- * 
- * @param {*} url 
- * @returns 
- */
-function readImage(url) {
-    return new Promise((resolve, reject) => {
-        const image = new window.Image();
-        image.onload = (e) => {
-            resolve(image);
-        }
-
-        image.onerror = (e) => {
-            reject(err)
-        }
-
-        image.src = url;
-    })
-}
-
-/**
- * 
- * @param {*} ev 
- * @param {*} reg 
- * @returns 
- */
-function getDatatransferFiles(ev, kind = 'file', reg) {
-    let files = [];
-
-    if(ev.dataTransfer.items) {
-        files = [...ev.dataTransfer.items].filter((item) => item.kind === kind)
-        .map((item) => item.getAsFile())
-    } else {
-        files = ev.dataTransfer.files;
-    }
-
-    const image_reg = reg || /^image\/(jpg|jpeg|png)$/i;
-    // We make sure that the files received are images by checking the mime type of the file
-    
-    return files.filter((file) => file.type.trim().match(image_reg));
-}
 
 /**
  * 
@@ -156,7 +90,7 @@ const Viewport = (props) => {
      */
     const onDrop= async (e) =>{
         e.preventDefault();
-        
+
         let url = e.dataTransfer.getData("text/uri-list");
 
         if(!url) url = e.dataTransfer.getData("text/plain");
@@ -187,6 +121,11 @@ const Viewport = (props) => {
         setChildren([...children]);
     };
 
+    /**
+     * 
+     * @param {*} e 
+     * @param {*} url 
+     */
     const addImageToViewport = async (e, url) => {
         const image = await readImage(url);
         const mouse = windowToCanvas(canvasRef.current, e.clientX, e.clientY);
@@ -307,7 +246,6 @@ const SideMenu = (props) => {
         e.target.parentNode.classList.add("border-2");
         e.target.parentNode.classList.add("border-dashed");
         e.target.parentNode.classList.add("border-cyan-400");
-        // e.target.classList.add("bg-sky-200");
     }
 
     /**
@@ -357,7 +295,6 @@ const SideMenu = (props) => {
         }
 
         if(props.onFileDropped) props.onFileDropped(e);
-        // handleDroppedFile(e);
     }
 
     /**
@@ -371,7 +308,6 @@ const SideMenu = (props) => {
     }
 
     // Mapping children items
-    // className="p-1 box-border last:border-0 odd:border-b-[#dfe6e9] h-fit hover:bg-[#b2bec3]/[0.9]"
     const children = items.map((item, index) => {
         return <li key={index} className={`p-1 box-border h-fit hover:bg-[#b2bec3]/[0.9] inline-block m-auto ${index === selected? 'bg-[#b2bec3]/[0.9]' : ''}`}
             draggable={true}

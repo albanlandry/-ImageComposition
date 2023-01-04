@@ -38,7 +38,7 @@ function readFile(file) {
 
 /**
  * 
- * @param {*} url 
+ * @param {*} url or url-based imageData
  * @returns 
  */
 function readImage(url) {

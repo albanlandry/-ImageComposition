@@ -1,16 +1,21 @@
 import React, { useContext, useEffect, useRef, useReducer, useState } from 'react';
+import ReactModal from 'react-modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Template from '../src/Template';
 import {FaPlus} from 'react-icons/fa';
 import {CiCircleRemove} from 'react-icons/ci';
 import {BiX} from 'react-icons/bi';
 import { callback, getDatatransferFiles, readFile, readImage } from '../src/Utils';
+import axios , {isCancel, AxiosError} from 'axios';
 
 const MIN_HEIGHT = 400;
 const DISPATCH_REMOVE_FILE = 'remove-file';
 const DISPATCH_ADD_FILES = 'add-file';
 const DISPATCH_SET_COVER_IMAGE = 'set-cover-image';
 const DISPATCH_UNSET_COVER_IMAGE = 'unset-cover-image';
+const INPUT_IMAGES = 'images[]';
+const INPUT_COVER = 'cover'
+const HOST = 'http://localhost';
 
 
 /** Data management reducer */
@@ -55,8 +60,40 @@ export default function CatchpointForm(props) {
      * @param {*} values 
      */
     const onSubmitHandler = async (values) => {
-        console.log('Values => ', values);
+        const formData = new FormData();
+
+        Object.keys(values).forEach(key => formData.append(key, values[key]));
+
+        // Add the cover file to the form data
+        if (state.cover.length > 0) state.cover.forEach(file => formData.append(INPUT_COVER, file))
+
+        // Adds the images files to the form data
+        if (state.files.length > 0) state.files.forEach(file => formData.append(INPUT_IMAGES, file))
+        
+        // Calling the uploadData function to submit the payload to the server.
+        uploadData(formData);
     };
+
+    const uploadData = async (data, options) => {
+        console.log(`${window.location.host}/api/catchpoints`)
+
+        const config = {
+            headers: { "Content-Type": "multipart/form-data" },
+            url: `http://localhost:3000/api/catchpoints`,
+            method: 'post',
+            data: data,
+            'content-type': 'multipart/form-data',
+            onUploadProgress: (progressEvent => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                console.log('Progress: ', percentCompleted);
+            }),
+            proxy: false 
+        }
+
+        axios.request(config)
+            .then((response) => console.log(response.data))
+            .catch((error) => console.log('error', error))
+    }
 
     /**
      * Handles the file selection from the file input
@@ -120,7 +157,7 @@ export default function CatchpointForm(props) {
                                 onFileDropped={onCoverroppedHandler}
                                 addItemRenderer= {
                                     <li className="w-full min-h-[256px] h-[300px] m-auto block">
-                                        <div className="w-full h-full rounded border-2 border-dashed flex justify-center items-center  cursor-pointer"
+                                        <div className="w-full h-full rounded border-2 border-dashed flex justify-center items-center  cursor-pointer hover:bg-cyan-100/[.25]"
                                             onClick={(e) => {                        
                                                 inputFileRef.current.click();
                                             }}
@@ -132,7 +169,7 @@ export default function CatchpointForm(props) {
                                 }
 
                                 renderItem={(file, index) => {
-                                    return <li key={index} className="min-h-[256px] h-[300px] overflow-y-hidden w-auto m-2 mx-auto block w-max relative transition-all duration-200">
+                                    return <li key={index} className="min-h-[256px] h-[300px] overflow-y-hidden w-auto m-2 mx-auto block w-auto relative transition-all duration-200">
                                         <BiX className="absolute rounded-full bg-red-500 hover:bg-red-700 text-white text-[20px] right-[10px] top-[10px] cursor-pointer" 
                                         onClick={(e) => {
                                             e.preventDefault();

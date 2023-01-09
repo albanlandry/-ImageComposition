@@ -13,7 +13,7 @@ const DISPATCH_REMOVE_FILE = 'remove-file';
 const DISPATCH_ADD_FILES = 'add-file';
 const DISPATCH_SET_COVER_IMAGE = 'set-cover-image';
 const DISPATCH_UNSET_COVER_IMAGE = 'unset-cover-image';
-const INPUT_IMAGES = 'images[]';
+const INPUT_IMAGES = 'images';
 const INPUT_COVER = 'cover'
 const HOST = 'http://localhost';
 

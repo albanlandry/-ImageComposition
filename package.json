@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "aws-sdk": "^2.1290.0",
     "axios": "^1.2.2",
     "canvas": "^2.10.2",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.6",
     "formidable": "^2.1.1",
     "formik": "^2.2.9",
+    "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "next": "13.0.6",

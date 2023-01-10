@@ -2,7 +2,7 @@ import React from 'react';
 
 const Header = (props) => {
     return (
-        <div className="w-full">
+        <div className="w-full border-b">
             {props.header || <h1 className="text-2xl font-bold text-right p-2">Header Menu</h1>
             }
         </div>
@@ -11,7 +11,7 @@ const Header = (props) => {
 
 const SideArea= (props) => {
     return (
-        <div className="h-full w-1/6 min-w-[180px]">
+        <div className="h-full w-1/6 min-w-[180px] border-r">
             { props.children }
         </div>
     )

@@ -3,10 +3,9 @@ import ReactModal from 'react-modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Template from '../src/Template';
 import {FaPlus} from 'react-icons/fa';
-import {CiCircleRemove} from 'react-icons/ci';
 import {BiX} from 'react-icons/bi';
 import { callback, getDatatransferFiles, readFile, readImage } from '../src/Utils';
-import axios , {isCancel, AxiosError} from 'axios';
+import axios from 'axios';
 
 const MIN_HEIGHT = 400;
 const DISPATCH_REMOVE_FILE = 'remove-file';
@@ -15,7 +14,6 @@ const DISPATCH_SET_COVER_IMAGE = 'set-cover-image';
 const DISPATCH_UNSET_COVER_IMAGE = 'unset-cover-image';
 const INPUT_IMAGES = 'images';
 const INPUT_COVER = 'cover'
-const HOST = 'http://localhost';
 
 
 /** Data management reducer */
@@ -123,8 +121,8 @@ export default function CatchpointForm(props) {
         dispatch({type: DISPATCH_SET_COVER_IMAGE, file: fs[0]})
     };
 
-    return <FileDispatch.Provider value={dispatch}>
-        <div className="p-2 m-auto w-10/12">
+    const mainArea =  <FileDispatch.Provider value={dispatch}>
+        <div className="py-2 px-10 m-auto w-9/12 h-full overflow-y-scroll">
             <Formik
                 initialValues={{
                     title: '',
@@ -195,7 +193,12 @@ export default function CatchpointForm(props) {
             </Formik>
         </div>
     </FileDispatch.Provider>
+
+    return <Template mainArea={mainArea} />
 }
+
+
+// <Template mainArea={<MainArea onViewportFileDropped={onViewportFileDropped} />} sideMenus={sideMenus} />
 
 /**
  * 

@@ -5,13 +5,11 @@ const s3Config = {
     apiVersion: '2006-03-01',
     accessKeyId: config.accessKeyId,
     secretAccessKey: config.secretAccessKey,
-    // LocationConstraint: config.region,
+    LocationConstraint: config.region,
     region: config.region,
 };
 
 const s3 = new S3(s3Config); // Configuration
-
-console.log('S3', s3.config);
 
 /**
  * 
@@ -54,7 +52,7 @@ module.exports.uploadFile = (bucket, file, contentType, serverPath, filename, ac
         ACL: access,
         Key: serverPath,
         Body: file,
-        ContentType: contentType,
+        // ContentType: contentType,
         // ContentDisposition: `attachment; filename=${filename}`,
     }).promise();
 }

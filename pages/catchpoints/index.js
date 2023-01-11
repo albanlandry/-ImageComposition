@@ -119,6 +119,8 @@ const MissionTable = (props) => {
             pointerOnHover={true}
             highlightOnHover={true}
             // progressPending={progress}
+            selectableRows
+            pagination
             />
             </div>
         </div>);

@@ -93,6 +93,7 @@ const handlePost = async (req, res) => {
       }));
     }
 
+    DB.destroy();
     res.status(200).json({status: 'success', createdAt: moment().format('YYYY-MM-DD HH:mm:ss')});
   } catch(err) {
     console.log(err);

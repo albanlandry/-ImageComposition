@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     
         const [missions, encoding] = await mysql.execute(query.call());
         
+        DB.destroy();
         res.status(200).send(missions);
     } catch (error) {
         console.log(error);

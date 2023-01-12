@@ -7,15 +7,13 @@ let Connection = null;
  * @returns 
  */
 module.exports.getMySQLConnection = async () => {
-    if(!Connection) {
-      Connection =  mysql.createPool({
-        host: 'dev-database.cmpvgajxiyud.ap-northeast-2.rds.amazonaws.com',
-        user: 'admin',
-        password: 'popsline1234',
-        database: 'metaversero',
-        connectionLimit: 2,
-      });
-    }
+    Connection =  mysql.createPool({
+      host: 'dev-database.cmpvgajxiyud.ap-northeast-2.rds.amazonaws.com',
+      user: 'admin',
+      password: 'popsline1234',
+      database: 'metaversero',
+      connectionLimit: 2,
+    });
 
     return Connection;
 }
@@ -25,5 +23,5 @@ module.exports.close = () => {
 }
 
 module.exports.destroy = () => {
-  if(Connection) Connection.destroy();
+    Connection.end();
 }

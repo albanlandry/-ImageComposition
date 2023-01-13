@@ -1,5 +1,4 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-const mysql = require('mysql2/promise');
 const formidable = require('formidable');
 const moment = require('moment'); // Ex: moment().format('YYYY-MM-DD')
 const fs = require('fs');

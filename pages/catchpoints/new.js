@@ -45,7 +45,7 @@ function reducer(state, action) {
  * 
  * @param {*} props 
  */
-export default function CatchpointForm(props) {
+function CatchpointForm(props) {
     const [state, dispatch] = useReducer(reducer, initialState);
     const inputFileRef = useRef(null);
 
@@ -72,6 +72,11 @@ export default function CatchpointForm(props) {
         uploadData(formData);
     };
 
+    /**
+     * 
+     * @param {*} data 
+     * @param {*} options 
+     */
     const uploadData = async (data, options) => {
         console.log(`${window.location.host}/api/catchpoints`)
 
@@ -197,9 +202,6 @@ export default function CatchpointForm(props) {
     return <Template mainArea={mainArea} />
 }
 
-
-// <Template mainArea={<MainArea onViewportFileDropped={onViewportFileDropped} />} sideMenus={sideMenus} />
-
 /**
  * 
  * @param {*} props 
@@ -211,6 +213,11 @@ function FileDropArea(props) {
     const files = props.files || [];
     const inputFileRef = useRef(null);
 
+    /**
+     * When the mouse enters the drop area while the user is dragging an element.
+     * @param {*} e 
+     * @returns 
+     */
     const onDragEnter = (e) => {
         e.preventDefault();
 
@@ -310,7 +317,7 @@ const FileThumbnailRenderer = (props) => {
     const [source, setSource] = useState(null)
     const [display, setDisplay] = useState(false)
     // If we want to perform an action, we can get dispatch from context.
-    const dispatch = useContext(FileDispatch);
+    const dispatch = useContext(FileDispatch) || props.dispatch;
     const className = props.className || "inline-block align-middle h-[400px]";
 
     useEffect(() => {
@@ -318,8 +325,19 @@ const FileThumbnailRenderer = (props) => {
             const data = await readFile(props.file);
             const image = await readImage(data);
 
-            if(image.width < MIN_HEIGHT) {
-                dispatch({type: DISPATCH_REMOVE_FILE, id: props.index});
+            let validated = true;
+            if (props.validate && !props.validate(image)) {
+                validated = false;
+            } else if(image.width < MIN_HEIGHT) {
+                validated = false;
+            }
+
+            // In case the validation process failed
+            if(!validated) {
+                if(dispatch) dispatch({type: DISPATCH_REMOVE_FILE, id: props.index});
+
+                if(props.onConstraintVerificationFailed) props.onConstraintVerificationFailed();
+
                 return;
             }
 
@@ -336,4 +354,8 @@ const FileThumbnailRenderer = (props) => {
         </>
     )
 };
+
+
+export { FileDropArea, FileThumbnailRenderer };
+export default CatchpointForm;
 

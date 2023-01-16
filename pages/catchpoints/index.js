@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import FilterIcon from '@mui/icons-material/Filter';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
@@ -27,6 +28,7 @@ Modal.defaultStyles.overlay.zIndex = 2;
 // Table component
 
 const URL_NEW_CATCH_POINT = '/catchpoints/new';
+const URL_MISSION_EDITOR = '/editor';
 
 /**
  * Fetches catchpoint data from the server
@@ -143,7 +145,7 @@ const MSubHeaderComponent = (props) => {
 
     return (
         <Stack direction="row" spacing={1}>
-            <Button variant="outlined" onClick={(e) => { dispatch({type: DISPATCH_ACTIONS.SET_MODAL, value: true}); } }>
+            <Button variant="outlined" onClick={props.onButtonClick || ((e) => { dispatch({type: DISPATCH_ACTIONS.SET_MODAL, value: true}); } ) }>
                 미션 만들기
             </Button>
         </Stack>
@@ -159,12 +161,38 @@ const MSubHeaderComponent = (props) => {
  */
 const MissionTable = (props) => {
     const missions = useCPMissions({params: {cId: props.data.id}});
+    const router = useRouter();
     const title = props.title || 'Missions';
+    const dispatch = props.dispatch;
     const columns = [
         { name: 'Title', selector: (row, _) => row.mission_title, sortable: true },
         { name: 'Description', selector: (row, _) => row.mission_desc, sortable: true },
         { name: 'Point', selector: (row, _) => row.mission_point },
         { name: 'thumbnail', selector: (row, _) => '-'/* row.mission_image */},
+        { name: 'Actions', selector: (row, _) => {            
+            return (
+                <Stack direction="row" spacing={1}>
+                    <Tooltip title="수정">
+                        <IconButton aria-label="edit">
+                            <EditOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="삭제">
+                        <IconButton aria-label="delete">
+                            <DeleteOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>                    
+                    <Tooltip title="미션 상세 이미지">
+                        <IconButton aria-label="details" 
+                            onClick={(e) => { console.log(row); router.push(`${URL_MISSION_EDITOR}/${row.id}`) }}
+                            >
+                            <FilterIcon />
+                        </IconButton>
+                    </Tooltip>
+
+                </Stack>
+            );}
+        }
     ];
     const [progress, setProgress] = useState(true)
 
@@ -177,7 +205,12 @@ const MissionTable = (props) => {
                     </div>
                 </div>
                 <div className="flex flex-1 p-3 flex-row justify-between">
-                    <MSubHeaderComponent {...props} />
+                    <MSubHeaderComponent onButtonClick={
+                        (e) => {
+                            dispatch({type: DISPATCH_ACTIONS.SET_MODAL, value: true});
+                            dispatch({type: DISPATCH_ACTIONS.SET_CURRENT_CP, value: props.data});
+                        }
+                    } {...props}  />
                 </div>
             <DataTable columns={columns} data={missions} title="Missions"
                 pointerOnHover={true}
@@ -190,13 +223,18 @@ const MissionTable = (props) => {
         </div>);
 };
 
-// Data and states management
+/* Data and states management ************************************************************************/
 const INPUT_NAME_THUMBNAIL = 'thumbnail';
-const initialState = {openModal: false, selectedMission: {title: '', desc: '', point: 0, thumbnail: []}};
+const initialState = {
+    openModal: false, 
+    selectedMission: {title: '', desc: '', point: 0, thumbnail: []},
+    currentCP: {id : 0}
+};
 
 const DISPATCH_ACTIONS = {
     SET_MODAL: 'set-modal',
     SET_MISSION_THUMBNAIL: 'set-mission-thumbnail',
+    SET_CURRENT_CP: 'set-current-cp',
     UNSET_MISSION_THUMBNAIL: 'unset-mission-thumbnail',
 };
 
@@ -214,6 +252,8 @@ function reducer(state, action) {
             return {...state, selectedMission: {...state.selectedMission, thumbnail: [action.value]}}
         case DISPATCH_ACTIONS.UNSET_MISSION_THUMBNAIL:
             return {...state, selectedMission: {...state.selectedMission, thumbnail: []}}
+        case DISPATCH_ACTIONS.SET_CURRENT_CP:
+            return {...state, currentCP: action.value};
         default:
             throw new Error();
     }
@@ -284,27 +324,27 @@ export default function Catchpoints(props) {
 
 
 
-/** //////////////////////////////////////////////////////////////////////////////////////// */
+    /** //////////////////////////////////////////////////////////////////////////////////////// */
 
-/**
- * 
- * @param {*} row 
- * @param {*} event 
- */
-const handleRowClicked = (row, event) => {
-    console.log(row, event);
-}
+    /**
+     * 
+     * @param {*} row 
+     * @param {*} event 
+     */
+    const handleRowClicked = (row, event) => {
+        console.log(row, event);
+    }
 
-/**
- * 
- * @param {*} props 
- * @returns 
- */
-const ExpandableRowsComponent = (props) => {
-    return <MissionTable data={props.data} dispatch={dispatch}/>;
-}
+    /**
+     * 
+     * @param {*} props 
+     * @returns 
+     */
+    const ExpandableRowsComponent = (props) => {
+        return <MissionTable data={props.data} dispatch={dispatch}/>;
+    }
 
-const mainArea = <div className="py-2 px-8 m-auto w-10/12 h-full overflow-y-scroll">
+    const mainArea = <div className="py-2 px-8 m-auto w-10/12 h-full overflow-y-scroll">
         <DataTable columns={columns} data={data} title="Catch points"
         pointerOnHover={true}
         highlightOnHover={true}
@@ -323,13 +363,14 @@ const mainArea = <div className="py-2 px-8 m-auto w-10/12 h-full overflow-y-scro
             style={customStyles}
             contentLabel="Example Modal"
         >
-            <NewMissionForm dispatch={dispatch} data={{...state.selectedMission, catchpoint_id: 1}} />
+            <NewMissionForm dispatch={dispatch} data={{...state.selectedMission, catchpoint_id: state.currentCP.id}} />
         </Modal>
     </div>
 
     return <Template mainArea={mainArea} />
 }
 
+export { useCatchpoints, useCPMissions }
 
 
 
@@ -338,6 +379,8 @@ const NewMissionForm = (props) => {
     const dispatch = props.dispatch || {};
     const data = props.data || {title: '', desc: '', point: ''};
     const inputFileRef = useRef(null);
+
+    console.log('props -> ', props.data);
 
     /**
      * Handles the file selection from the file input
@@ -367,8 +410,8 @@ const NewMissionForm = (props) => {
         console.log(values, data)
         const formData = new FormData();
 
+
         Object.keys(values).forEach(key => formData.append(key, values[key]));
-        formData.append('catchpoint_id', data.catchpoint_id)
 
         // Add the cover file to the form data
         data.thumbnail.forEach(file => formData.append(INPUT_NAME_THUMBNAIL, file))
@@ -399,7 +442,15 @@ const NewMissionForm = (props) => {
         }
 
         axios.request(config)
-            .then((response) => console.log(response.data))
+            .then((response) => {
+                console.log(response.data)
+                alert('저장되었습니다');
+
+                // Close the modal and refresh the page
+                dispatch({type: DISPATCH_ACTIONS.SET_MODAL, action: false});
+
+                setTimeout(() => window.location.reload(), 500);
+            })
             .catch((error) => console.log('error', error))
     }
 

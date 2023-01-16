@@ -78,7 +78,7 @@ function CatchpointForm(props) {
      * @param {*} options 
      */
     const uploadData = async (data, options) => {
-        console.log(`${window.location.host}/api/catchpoints`)
+        // console.log(`${window.location.host}/api/catchpoints`)
 
         const config = {
             headers: { "Content-Type": "multipart/form-data" },

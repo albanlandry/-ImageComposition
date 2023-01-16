@@ -11,7 +11,7 @@ const Header = (props) => {
 
 const SideArea= (props) => {
     return (
-        <div className="h-full w-1/6 min-w-[180px] border-r">
+        <div className="h-full w-1/6 min-w-[180px] max-w-[220px] border-r">
             { props.children }
         </div>
     )

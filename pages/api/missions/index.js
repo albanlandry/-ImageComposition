@@ -92,12 +92,15 @@ const handlePost = async (req, res) => {
         const mysqlConnection = await DB.getMySQLConnection();
         const mission = [inputs.title, inputs.desc, inputs.point, `${thumbnail.Location}`, inputs.catchpoint_id];
 
-        console.log(mission);
         // Actul insertion of the record in database
         const [lastRecord, _] = await mysqlConnection.execute(Q_INSERT_MISSIONS, mission);
 
+        console.log('Last record', lastRecord);
+
         DB.destroy();
-        res.status(200).json({status: 'success', createdAt: moment().format('YYYY-MM-DD HH:mm:ss')});
+
+        if(lastRecord.insertId > 0) res.status(200).json({status: 'success', createdAt: moment().format('YYYY-MM-DD HH:mm:ss')});
+        else res.status(401).json({status: 'failed', date: moment().format('YYYY-MM-DD HH:mm:ss')});
     } catch (error) {
         console.log(error);
         res.status(500).json({ err: "Unable to perform the POST request." });

@@ -65,12 +65,45 @@ export async function getStaticProps({ params }) {
 
 /**
  * 
+ * @param {*} missionId 
+ * @param {*} paramName 
+ * @returns 
+ */
+const useMissionParam = (missionId, paramName) => {
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        const fetchData = async() => {
+            const config = {
+                url: `http://localhost:3000/api/missions/infos?mId=${missionId}&p=${paramName}`,
+                method: 'GET',
+            }
+
+            console.log(`http://localhost:3000/api/missions/infos?mId=${missionId}&p=${paramName}`,);
+
+            try {
+                const response = await axios.request(config);
+
+                setData(response.data);
+            } catch (error) {
+                console.log({err: error.message})
+            }
+        }
+
+        fetchData();
+    }, [missionId, paramName])
+
+    return data;
+}
+
+/**
+ * 
  */
 const Button = React.memo((props) => {
     const bgColor = props.bgColor || "#000000";
 
     return(
-        <a href="#" className={`btn-default bg-[${bgColor}] hover:bg-[${bgColor}]/[0.9] active:ring-2 mt-5`}>Create new foreground</a>
+        <a href="#" className={`btn-default bg-[#0984e3] hover:bg-[#0984e3]/[0.9] active:ring-2 mt-5`}>Create new foreground</a>
     )
 });
 
@@ -222,6 +255,7 @@ const Viewport = (props) => {
  * @returns 
  */
 const MainArea = function (props) {
+    const scene = props.scene || [];
     const handleOnUserFileDropped = (e) => {
         if(props.onViewportFileDropped) props.onViewportFileDropped(e);
     }
@@ -229,8 +263,8 @@ const MainArea = function (props) {
     return(
         // <div className="w-5/6 h-full bg-[#dfe6e9]">
         <div className="w-full h-full bg-[#dfe6e9]">
-            { /* <DefaultHomeArea /> */ }
-            <Viewport onUserFileDropped={handleOnUserFileDropped} />
+            { scene.length > 0 ? <Viewport onUserFileDropped={handleOnUserFileDropped} /> : <DefaultHomeArea /> }
+            {/* <Viewport onUserFileDropped={handleOnUserFileDropped} /> */}
         </div>
     )
 };
@@ -419,7 +453,11 @@ const Thumbnail = React.memo((props) => {
 export default function Editor (props) {
     // console.log('Props => ', props.mission);
     // Data
+    const mission = props.mission;
+    const scene = useMissionParam(mission.id, 'scene');
     const [items, setItems] = useState([]);
+
+    console.log('Parameter', scene);
 
     // Events handlers
     const handleDroppedFile = async (ev) => {
@@ -437,16 +475,18 @@ export default function Editor (props) {
         setItems(items.concat(result));
     }
 
-    // UI elements
-    const sideMenus = [<SideMenu items={items} key={0} onFileDropped={handleDroppedFile.bind(this)}/>];
-
     const onViewportFileDropped = (e) => {
         e.preventDefault();
 
         handleDroppedFile(e);
     }
 
+    // UI elements
+    const sideMenus = scene.length > 0 ? [<SideMenu items={items} key={0} onFileDropped={handleDroppedFile.bind(this)}/>]
+        : [];
+    const mainArea = <MainArea scene={scene} onViewportFileDropped={onViewportFileDropped} />;
+
    return(
-    <Template mainArea={<MainArea onViewportFileDropped={onViewportFileDropped} />} sideMenus={sideMenus} />
+    <Template mainArea={mainArea} sideMenus={sideMenus} />
    )
 }

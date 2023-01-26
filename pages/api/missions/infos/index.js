@@ -31,7 +31,7 @@ const handleGet = async (req, res) => {
     try{
 
         if(req.query.mId && req.query.p) {
-            console.log('Params', [req.query.mId, req.query.p]);
+            // console.log('Params', [req.query.mId, req.query.p]);
             const [info, encoding] = await mysql.execute(Q_SELECT_MISSIONS_PARAM, [req.query.mId, req.query.p]);
             res.status(200).json(info);
 

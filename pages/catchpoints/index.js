@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useRef, useReducer, useState } from 'react';
+import React, { useEffect, useRef, useReducer, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { DataGrid } from '@mui/x-data-grid';
-import ReactModal from 'react-modal';
 import Template from '../src/Template';
 import { callback, readFile, readImage } from '../src/Utils';
 import axios from 'axios';
@@ -276,7 +275,6 @@ export default function Catchpoints(props) {
                         <EditOutlinedIcon />
                     </IconButton>
                 </Tooltip>
-
                 <Tooltip title="삭제">
                     <IconButton aria-label="delete">
                         <DeleteOutlinedIcon />
@@ -296,7 +294,6 @@ export default function Catchpoints(props) {
         { name: 'Actions', selector: (row, _) => {return <RowActionsButtons row={row}/> } },
     ];
 
-
     /** Modal related elements ///////////////////////////////////////////////////////////////// */
     const customStyles = {
         content: {
@@ -309,20 +306,21 @@ export default function Catchpoints(props) {
             transform: 'translate(-50%, -50%)',
         },
     };
-      
-    let subtitle;
 
+    /**
+     * 
+     */
     function afterOpenModal() {
         // references are now sync'd and can be accessed.
         // subtitle.style.color = '#f00';
     }
     
+    /**
+     * 
+     */
     function closeModal() {
         // dispatch({type: DISPATCH_ACTIONS.SET_MODAL, value: false});
     }
-
-
-
 
     /** //////////////////////////////////////////////////////////////////////////////////////// */
 
@@ -371,8 +369,6 @@ export default function Catchpoints(props) {
 }
 
 export { useCatchpoints, useCPMissions }
-
-
 
 /** Forms ////////////////////////////////////////////////////////////////////////////////////// */
 const NewMissionForm = (props) => {

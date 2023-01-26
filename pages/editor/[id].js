@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import Template from '../src/Template';
 import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
@@ -7,6 +7,8 @@ import { windowToCanvas } from '../src/drawing/CanvasUtils';
 import { isPointInRect } from '../src/core/DrawingUtils';
 import axios from 'axios';
 import { getDatatransferFiles, readFile, readImage } from '../src/Utils';
+import Modal from 'react-modal';
+import { ModalNewComposition } from '../src/ui/Modal';
 
 
 /**
@@ -63,6 +65,10 @@ export async function getStaticProps({ params }) {
     };
 }
 
+// Modal
+Modal.setAppElement('#main-container');
+Modal.defaultStyles.overlay.zIndex = 2;
+
 /**
  * 
  * @param {*} missionId 
@@ -103,14 +109,20 @@ const Button = React.memo((props) => {
     const bgColor = props.bgColor || "#000000";
 
     return(
-        <a href="#" className={`btn-default bg-[#0984e3] hover:bg-[#0984e3]/[0.9] active:ring-2 mt-5`}>Create new foreground</a>
+        <a href="#" className={`btn-default bg-[#0984e3] hover:bg-[#0984e3]/[0.9] active:ring-2 mt-5`}
+        onClick={(e) => {
+            e.preventDefault();
+
+            props?.onButtonClick();
+        }}>Create new foreground</a>
     )
 });
 
 /**
  * 
  */
-const DefaultHomeArea = React.memo(() => {
+const DefaultHomeArea = React.memo((props) => {
+    const dispatch = props.dispatch || (() => {})
     /**
      * 
      * @param {*} e 
@@ -151,7 +163,7 @@ const DefaultHomeArea = React.memo(() => {
             >
                 <h2 className="text-center">You can drop your image here or click on the Button below to create a new foreground</h2>
                 <div className="">
-                    <Button bgColor="#0984e3" />
+                    <Button bgColor="#0984e3" onButtonClick={(e) => {dispatch({type: DISPATCH_ACTIONS.SET_CMP_MODAL, value: true})}} />
                 </div>
             </div>
         </div>
@@ -249,23 +261,86 @@ const Viewport = (props) => {
     )
 };
 
+/* Data and states management ************************************************************************/
+const initialComposition = {
+    openNewCompositionModal: null,
+    linkDimensions: false, // To link the current dimensions been edited
+    width: 512,
+    height: 512
+};
+
+const DISPATCH_ACTIONS = {
+    SET_CMP_MODAL: 'set-cmp-modal',
+    SET_LINK_DIMENS: 'set-link-dimens',
+    SET_SIZE: 'set-size',
+    SET_SIZE_WIDTH: 'set-size-width',
+    SET_SIZE_HEIGHT: 'set-size-height',
+};
+
+/**
+ * 
+ * @param {*} state 
+ * @param {*} action 
+ * @returns 
+ */
+function reducer(state, action) {
+    switch (action.type) {
+        case DISPATCH_ACTIONS.SET_CMP_MODAL:
+            return {...state, openNewCompositionModal: action.value};
+        case DISPATCH_ACTIONS.SET_SIZE:
+            let w = 0, h = 0;
+
+            try {
+                w = action.value[0];
+                h = action.value[1];
+            }catch(err) {
+                alert(err.message);
+                return {...state};
+            }    
+
+            return {...state, ...{width: w, height: h}};
+        case DISPATCH_ACTIONS.SET_SIZE_WIDTH:
+            return {...state, ...{width: action.value}};
+        case DISPATCH_ACTIONS.SET_SIZE_HEIGHT:
+            return {...state, ...{height: action.value}};
+        case DISPATCH_ACTIONS.SET_LINK_DIMENS:
+            return {...state, ...{linkDimensions: action.value}};
+        default:
+            throw new Error('UNDEFINED Action type');
+    }
+}
+
 /**
  * 
  * @param {*} props 
  * @returns 
  */
 const MainArea = function (props) {
+    const [state, dispatch] = useReducer(reducer, initialComposition);
     const scene = props.scene || [];
+
+    /**
+     * 
+     * @param {*} e 
+     */
     const handleOnUserFileDropped = (e) => {
         if(props.onViewportFileDropped) props.onViewportFileDropped(e);
     }
 
     return(
         // <div className="w-5/6 h-full bg-[#dfe6e9]">
-        <div className="w-full h-full bg-[#dfe6e9]">
-            { scene.length > 0 ? <Viewport onUserFileDropped={handleOnUserFileDropped} /> : <DefaultHomeArea /> }
-            {/* <Viewport onUserFileDropped={handleOnUserFileDropped} /> */}
-        </div>
+        // btn-default bg-[#0984e3] hover:bg-[#0984e3]/[0.9] active:ring-2
+        <>
+            <div className="w-full h-full bg-[#dfe6e9]">
+                { scene.length > 0 ? <Viewport dispatch={dispatch} onUserFileDropped={handleOnUserFileDropped} /> : <DefaultHomeArea dispatch={dispatch} /> }
+                {/* <Viewport onUserFileDropped={handleOnUserFileDropped} /> */}
+            </div>
+            <ModalNewComposition 
+                open={state.openNewCompositionModal} 
+                data={{width: state.width, height: state.height}} 
+                onRequestClose={(e) => dispatch({type: DISPATCH_ACTIONS.SET_CMP_MODAL, value: false}) }
+                />
+        </>
     )
 };
 

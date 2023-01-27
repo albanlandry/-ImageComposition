@@ -173,7 +173,7 @@ const LabelledFormikField = (props) => {
     return(
         <div className={`${props.className || ''}`}>
             <label className="font-light text-sm mx-4 inline-block min-w-[50px]" htmlFor={`${name}`}>{label}</label>
-            <Field className="p-2 border" id={`${name}`} type={`${type}`} name={`${name}`} />
+            <Field className="p-2 border" id={`${name}`} type={`${type}`} name={`${name}`} {...props} />
         </div>
     );
 };
@@ -199,7 +199,7 @@ const CustomCheckBox = (props) => {
         if(props.onChange) props.onChange(newValue);
     }
 
-    return <div className="inline-block relative hover:bg-[#ECECEC]/[0.5] p-1" onClick={onClickHandler}>
+    return <div className="inline-block relative hover:bg-[#ECECEC]/[0.5] p-1 rotate-90" onClick={onClickHandler}>
         <Field className="absolute cursor-pointer h-0 w-0 opacity-0" name="linkInput" type="checkbox"/>
         {isChecked ? <MdLink /> : <MdLinkOff />}
     </div>
@@ -220,6 +220,22 @@ function ModalNewComposition(props) {
         if(props.onRequestClose) props.onRequestClose(e);
     }
 
+    /**
+     * 
+     * @param {*} e 
+     */
+    const updateWidth = (e) => {
+        console.log(e.nativeEvent.target.value);
+    }
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    const updateHeight = (e) => {
+
+    }
+
     return (
         <Modal
         isOpen={props.open}
@@ -232,6 +248,10 @@ function ModalNewComposition(props) {
                 height: state.height
             }}
             onSubmit={(values, action) => {
+                console.log(values, action);
+                try {
+                    props.onSubmit(values);
+                } catch (e) {}
             }}
         >
             <Form>
@@ -239,8 +259,8 @@ function ModalNewComposition(props) {
                     <legend className="mx-3">Image Size</legend>
                     <div className="p-2 relative flex">
                         <div>
-                            <LabelledFormikField name="width" label="Width:" type="number"/>
-                            <LabelledFormikField name="height" label="Height:" type="number"/>
+                            <LabelledFormikField name="width" label="Width:" type="number" onKeyUp={updateWidth} />
+                            <LabelledFormikField name="height" label="Height:" type="number" onKeyDown={updateHeight} />
                         </div>
                         <div className="p-1 flex items-center">
                             <CustomCheckBox checked/>

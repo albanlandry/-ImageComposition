@@ -248,7 +248,6 @@ function ModalNewComposition(props) {
                 height: state.height
             }}
             onSubmit={(values, action) => {
-                console.log(values, action);
                 try {
                     props.onSubmit(values);
                 } catch (e) {}

@@ -178,7 +178,7 @@ const DefaultHomeArea = React.memo((props) => {
 const Viewport = (props) => {
     const [pos, setPos] = useState({x: 0, y: 0});
     const [children, setChildren] = useState([]);
-    const [dimens, setDimens] = useState([700, 525]);
+    const [dimens, setDimens] = useState([props.width || 700, props.height || 525]);
     const canvasRef = useRef(null);
 
     /**
@@ -265,8 +265,8 @@ const Viewport = (props) => {
 const initialComposition = {
     openNewCompositionModal: null,
     linkDimensions: false, // To link the current dimensions been edited
-    width: 512,
-    height: 512
+    width: 0,
+    height: 0
 };
 
 const DISPATCH_ACTIONS = {
@@ -288,7 +288,7 @@ function reducer(state, action) {
         case DISPATCH_ACTIONS.SET_CMP_MODAL:
             return {...state, openNewCompositionModal: action.value};
         case DISPATCH_ACTIONS.SET_SIZE:
-            let w = 0, h = 0;
+            let w = state.width, h = state.height;
 
             try {
                 w = action.value[0];
@@ -327,15 +327,31 @@ const MainArea = function (props) {
         if(props.onViewportFileDropped) props.onViewportFileDropped(e);
     }
 
+    /**
+     * 
+     * @param {*} values 
+     */
+    const handleMNCSubmit = (values) => {
+        console.log('Values', values);
+        dispatch({type: DISPATCH_ACTIONS.SET_CMP_MODAL, value: false});
+        dispatch({type: DISPATCH_ACTIONS.SET_SIZE, value: [values.width || 0, values.height || 0]});
+    };
+
     return(
         // <div className="w-5/6 h-full bg-[#dfe6e9]">
         // btn-default bg-[#0984e3] hover:bg-[#0984e3]/[0.9] active:ring-2
         <>
             <div className="w-full h-full bg-[#dfe6e9]">
-                { scene.length > 0 ? <Viewport dispatch={dispatch} onUserFileDropped={handleOnUserFileDropped} /> : <DefaultHomeArea dispatch={dispatch} /> }
+                { (scene.length > 0 || (state.width > 0 && state.height > 0)) 
+                ? <Viewport dispatch={dispatch} onUserFileDropped={handleOnUserFileDropped}
+                    width={state.width}
+                    height={state.height}
+                    /> 
+                : <DefaultHomeArea dispatch={dispatch} /> }
                 {/* <Viewport onUserFileDropped={handleOnUserFileDropped} /> */}
             </div>
             <ModalNewComposition 
+                onSubmit={handleMNCSubmit}
                 open={state.openNewCompositionModal} 
                 data={{width: state.width, height: state.height}} 
                 onRequestClose={(e) => dispatch({type: DISPATCH_ACTIONS.SET_CMP_MODAL, value: false}) }

@@ -548,8 +548,6 @@ export default function Editor (props) {
     const scene = useMissionParam(mission.id, 'scene');
     const [items, setItems] = useState([]);
 
-    console.log('Parameter', scene);
-
     // Events handlers
     const handleDroppedFile = async (ev) => {
         const files = getDatatransferFiles(ev);
@@ -573,8 +571,7 @@ export default function Editor (props) {
     }
 
     // UI elements
-    const sideMenus = scene.length > 0 ? [<SideMenu items={items} key={0} onFileDropped={handleDroppedFile.bind(this)}/>]
-        : [];
+    const sideMenus = [<SideMenu items={items} key={0} onFileDropped={handleDroppedFile.bind(this)}/>];
     const mainArea = <MainArea scene={scene} onViewportFileDropped={onViewportFileDropped} />;
 
    return(

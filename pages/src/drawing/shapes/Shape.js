@@ -1,4 +1,4 @@
-import Victor from 'Victor';
+import Victor from 'victor';
 import { DocumentSnapshot, ImageSnapshot, ShapeSnapshot } from '../../core/store/Snapshot';
 
 /**

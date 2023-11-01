@@ -39,7 +39,7 @@ export async function getStaticPaths() {
 }
 
 /**
- * Exports data to be used in the the subsequently generated page
+ * Exports data to be used inside the the subsequently generated page
  * @param {*} param 
  */
 export async function getStaticProps({ params }) {

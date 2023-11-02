@@ -81,7 +81,7 @@ const DefaultHomeArea = React.memo(() => {
 const Viewport = (props) => {
     const [pos, setPos] = useState({x: 0, y: 0});
     const [children, setChildren] = useState([]);
-    const [dimens, setDimens] = useState([700, 525]);
+    const [dimens, setDimens] = useState([1133, 700]);
     const canvasRef = useRef(null);
 
     /**

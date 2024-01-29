@@ -71,7 +71,7 @@ const Canvas = (props) => {
 
     return (
         <canvas
-            className = "border border-solid border-[rgba(0,0,0,0.4)] box-border shadow-[2px_2px_4px_rgba(0,0,0,1)]"
+            //className = "border border-solid border-[rgba(0,0,0,0.4)] box-border shadow-[2px_2px_4px_rgba(0,0,0,1)]"
             ref={canvasRef} width={canvasWidth} height={canvasHeight}>
         </canvas>
     )

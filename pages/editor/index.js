@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import Template from '../src/Template';
 import Canvas from '../src/drawing/Canvas';
 import { Rect, Image }from '../src/drawing/drawables/Shapes';
@@ -83,6 +83,23 @@ const Viewport = (props) => {
     const [children, setChildren] = useState([]);
     const [dimens, setDimens] = useState([1133, 700]);
     const canvasRef = useRef(null);
+    const viewportRef = useRef(null);
+
+    useEffect(() => {
+        const resizeWindow = () => {
+            const vp = viewportRef.current;
+            const dimens = vp.getBoundingClientRect();
+
+            // console.log(dimens);
+            setDimens([dimens.width, dimens.height]);
+        };
+
+        window.addEventListener('resize', resizeWindow);
+
+        return () => {
+            window.removeEventListener('resize', resizeWindow);
+        }
+    })
 
     /**
      * 
@@ -154,7 +171,7 @@ const Viewport = (props) => {
     }
 
     return(
-        <div className="p-5 w-full h-full flex justify-center items-center overflow-auto">
+        <div ref={viewportRef} className="w-full h-full flex justify-center items-center overflow-auto" >
             <div className="bg-slate-50" onDrop={onDrop} onDragEnter={onDragEnter} onDragOver={(e) => { e.preventDefault(); }}>
                 <Canvas width={dimens[0]} height={dimens[1]} pointer={pos} onCanvasReady={onCanvasReady}>
                     {children}
